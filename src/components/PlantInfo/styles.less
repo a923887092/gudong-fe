@@ -1,0 +1,74 @@
+.plant-info {
+  &-header {
+    background: #FFFFFF;
+    color: #000000;
+  }
+  &-content {
+    padding: 0 20px;
+    margin-top: 45px;
+    font-size: 14px;
+    &-field {
+      margin-top: 10px;
+      margin-bottom: 20px;
+      ::-webkit-input-placeholder { font-size: 14px; }
+      ::-moz-placeholder { font-size: 14px; }
+      :-ms-input-placeholder { font-size: 14px; }
+      input:-moz-placeholder { font-size: 14px; }
+      &:nth-child(2), &:nth-child(4) {
+        margin-bottom: 40px;
+      }
+      .area-icon {
+        height: 15px;
+        width: 11px;
+      }
+    }
+  }
+  &-protocol {
+    display: flex;
+    align-items: center;
+    justify-content: start;
+    margin-top: 5px;
+    img {
+      width: 18px;
+      height: 18px;
+      margin-right: 10px;
+    }
+    span {
+      font-size: 14px;
+      font-family: PingFangSC-Regular;
+      color: rgba(51,51,51,1);
+    }
+    a {
+      font-size: 14px;
+      font-family: PingFangSC-Regular;
+      color: #14BA72;
+    }
+  }
+  &-btn {
+    display: flex;
+    justify-content: center;
+    margin-top: 75px;
+    margin-bottom: 30px;
+    &-style {
+      width: 335px;
+      background: linear-gradient(to right, #3FE993, #14BA72);
+    }
+  }
+  .popup-style {
+    height: 280px;
+    width: 375px;
+    &-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      height: 61px;
+      font-size: 17px;
+      padding: 0 20px;
+    }
+    &-picker {
+      padding: 10px 20px;
+      
+    }
+  }
+  
+}
