@@ -1,11 +1,11 @@
 <template>
   <div class="plant-res">
     <mt-header v-if="!isInWX" class="plant-res-header" fixed>
-      <mt-button slot='left' icon='back'><strong>认种结果</strong></mt-button>
+      <mt-button slot='left' icon='back'><strong>{{ result ? '认种成功' : '认种失败' }}</strong></mt-button>
     </mt-header>
     <div class="plant-res-content">
       <img :src="result ? require('@/assets/img_success.png') :require('@/assets/img_fail.png') " />
-      <span class="plant-res-content-text">恭喜您，成功认种一棵水蜜桃树！</span>
+      <span class="plant-res-content-text">{{ result ? '恭喜您，成功认种一棵水蜜桃树！' : '非常抱歉，您已放弃了认种！' }}</span>
     </div>
     <div class="plant-res-btn">
       <mt-button class="plant-res-btn-style" type="primary" @click="handlePlant">关注公众号</mt-button>
@@ -26,11 +26,25 @@ export default {
   data () {
     return {
       isInWX: storage.get('isInWX'),
-      result: true
+      result: (this.$route.params.code + '') === '1'
     }
   },
   mounted () {
-    document.title = '认种结果'
+    document.title = this.result ? '认种成功' : '认种失败'
+    if (this.result) {
+      history.pushState(null, null, location.href)
+      window.addEventListener('popstate', this.popstateCallback)
+    }
+  },
+  methods: {
+    popstateCallback (event) {
+      history.pushState(null, null, location.href)
+      window.removeEventListener('popstate', this.popstateCallback)
+      location.href = '/#/'
+    },
+    handleBackHome () {
+      location.href = '/#/'
+    }
   }
 }
 </script>

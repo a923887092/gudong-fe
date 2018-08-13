@@ -19,7 +19,7 @@
       </div>
       <img class="plant-divider" src="../../assets/img_detail_separatorcolumn.png"/>
       <div class="plant-introduce">
-        <img src="../../assets/icon_introduce.png"/>
+        <img src="../../assets/icon_people.png"/>
         <span>认种人列表</span>
       </div>
       <div class="farm-tab-nodata" v-show="!userList || userList.length === 0">
@@ -81,7 +81,7 @@ export default {
   },
   methods: {
     handlePlant () {
-      this.$router.push({ path: '/infoPlant/' + this.plantNo + '/price/' + this.plantData.plantPrice })
+      this.$router.push({ params: { a: 1 }, path: '/infoPlant/' + this.plantNo + '/price/' + this.plantData.plantPrice })
     },
     handleBack () {
       this.$router.go(-1)

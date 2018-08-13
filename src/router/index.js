@@ -11,7 +11,7 @@ import PlantRes from '@/components/PlantRes/index'
 Vue.use(Router)
 
 export default new Router({
-  mode: 'history',
+  mode: 'hash',
   routes: [
     {
       path: '/',
@@ -44,7 +44,7 @@ export default new Router({
       component: PlantInfo
     },
     {
-      path: '/resPlant',
+      path: '/resPlant/:code',
       name: 'resPlant',
       component: PlantRes
     }

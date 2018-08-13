@@ -100,7 +100,7 @@
             <img src="@/assets/img_logo_nodata.png"/>
             <span>农场还没有吐槽，快来参加吐槽吧～</span>
           </div>
-          <ul v-show="message && message.length > 0" v-infinite-scroll="loadMore" infinite-scroll-disabled="pageLoading" infinite-scroll-distance="10">
+          <ul v-show="message && message.length > 0" v-infinite-scroll="loadMore" :infinite-scroll-disabled="pageLoading" :infinite-scroll-distance="10">
             <li
               v-for="(item) in message"
               :key="item.messageNo"
@@ -109,8 +109,8 @@
               <img class="comment-img" :src="item.headImg"/>
               <div style="flex: 1;">
                 <div class="comment-title">
-                  <span>{{ item.userName }}</span>
-                  <span>{{ item.messageTime }}</span>
+                  <span>{{ item.userName || '' }}</span>
+                  <span>{{ genMsgTime(item.messageTime) }}</span>
                 </div>
                 <div class="comment-content">
                   <div class="comment-content-text">
@@ -123,7 +123,7 @@
                   </div>
                   <div class="comment-content-img-container">
                     <div class="comment-content-img" v-for="(imgUrl, index) in item.messageUrl" :key="index">
-                      <img :src="imgUrl.imgUrl" />
+                      <img :src="imgUrl" />
                     </div>
                   </div>
                 </div>
@@ -179,7 +179,7 @@
           </div>
           <div class="plant-people" v-show="plantHis && plantHis.length > 0">
             <div v-for="(item, i) in plantHis" class="plant-people-item" :key="i">
-              <img src="item.headImg"/>
+              <img :src="item.headImg"/>
               <div>{{ userName }}</div>
             </div>
           </div>
@@ -195,11 +195,16 @@
 <script>
 import { Header, Button, Progress, Navbar, TabItem, TabContainer, TabContainerItem, Badge, InfiniteScroll } from 'mint-ui'
 // import './custom-theme.css'
+import Vue from 'vue'
 import Ellipsis from '../base/ellipsis-plus'
 import storage from '@/utils/storage'
 import sStorage from '@/utils/sessionStorage'
 import apis from '@/components/base/api'
 import fetchData from '@/utils/fetch'
+import moment from 'moment'
+// const wx = require('weixin-js-sdk')
+
+Vue.use(InfiniteScroll)
 
 export default {
   name: 'LiveDetail',
@@ -208,6 +213,17 @@ export default {
     // setTimeout(() => {
     //   vm.videoControlStatus = false
     // }, 3000)
+    const hiddenProperty = 'hidden' in document ? 'hidden' : 'webkitHidden' in document ? 'webkitHidden' : 'mozHidden' in document ? 'mozHidden' : null
+    const visibilityChangeEvent = hiddenProperty.replace(/hidden/i, 'visibilitychange')
+    const onVisibilityChange = function () {
+      if (document[hiddenProperty]) {
+        console.log('页面非激活')
+      } else {
+        console.log('页面激活')
+      }
+    }
+    document.addEventListener(visibilityChangeEvent, onVisibilityChange)
+
     const audio = document.querySelector('#audioTag')
     this.audio = audio
     audio.addEventListener('timeupdate', this.updateProgress, false)
@@ -282,7 +298,9 @@ export default {
       audioProgress: 0,
       videoControlStatus: true,
       newMessages: 0,
-      currentPage: 1
+      currentPage: 1,
+      plantHis: [],
+      pageLoading: false
     }
   },
   beforeRouteEnter (to, from, next) {
@@ -305,7 +323,7 @@ export default {
     [TabContainerItem.name]: TabContainerItem,
     [Ellipsis.name]: Ellipsis,
     [Badge.name]: Badge,
-    [InfiniteScroll.name]: InfiniteScroll,
+    // [InfiniteScroll.name]: InfiniteScroll,
     [Button.name]: Button
   },
   watch: {
@@ -326,6 +344,20 @@ export default {
     }
   },
   methods: {
+    genMsgTime (time) {
+      const res = new Date().getTime() - time
+      if (res < 5000) {
+        return '刚刚'
+      } else if (res < 60000) {
+        return Math.round(res / 1000) + '秒'
+      } else if (res < 3600000) {
+        return Math.round(res / 60000) + '分钟'
+      } else if (res < 86400000) {
+        return Math.round(res / 3600000) + '小时'
+      } else {
+        return moment(time).format('YYYY-MM-DD')
+      }
+    },
     goBack: function () {
       this.$router.go(-1)
     },

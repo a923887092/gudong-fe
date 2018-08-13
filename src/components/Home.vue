@@ -43,7 +43,7 @@ import storage from '@/utils/storage'
 import sStorage from '@/utils/sessionStorage'
 import 'swiper/dist/css/swiper.css'
 import fetchData from '@/utils/fetch'
-// import paramsUtils from '@/utils/params'
+import paramsUtils from '@/utils/params'
 import apis from '@/components/base/api'
 
 Vue.use(Lazyload)
@@ -51,17 +51,6 @@ Vue.use(Lazyload)
 export default {
   name: 'Home',
   created () {
-    // const params = { platform: '1' }
-    // if (storage.get('isInWX')) {
-    //   const code = paramsUtils.url2json(location).code
-    //   params.code = code
-    //   params.platform = '1'
-    // }
-    // const code = paramsUtils.url2json(location).code
-    // params.code = code
-    // fetchData('/api/gateway/auth/getToken', params).then(res => {
-    //   console.log('111:' + JSON.stringify(res))
-    // })
   },
   data: function () {
     return {
@@ -96,18 +85,39 @@ export default {
   },
   mounted () {
     const vm = this
-    this.isInWX && this.$getJsConfig(location, [], function () {
-      vm.wxIsReady = true
-    }, function (res) {})
+    const params = { platform: '2' }
+    if (this.isInWX) {
+      const code = paramsUtils.url2json(location).code
+      params.code = code
+      params.platform = '1'
+    }
+    const code = paramsUtils.url2json(location).code
+    params.code = code
     document.title = '种植基地'
-    const token = '/ImP2frgV8ePu0xvUuYkNLTtsskj5yGwcxJCqkdMxrA='
-    sStorage.set('token', token)
-    fetchData(apis.home, { accessToken: token, platform: this.isInWX ? '1' : '2' }).then(res => {
-      if (res.code === 0) {
-        this.banners = res.data.banners
-        this.farms = res.data.farms
-      }
-    })
+    if (sStorage.get('token')) {
+      fetchData(apis.home, { accessToken: sStorage.get('token'), platform: this.isInWX ? '1' : '2' }).then(res => {
+        if (res.code === 0) {
+          this.banners = res.data.banners
+          this.farms = res.data.farms
+        }
+      })
+    } else {
+      fetchData('/api/gateway/auth/getToken', params).then(res => {
+        const token = res.data.accessToken
+        sStorage.set('token', token)
+        this.isInWX && this.$getJsConfig(location.href.split('#')[0], [], function () {
+          vm.wxIsReady = true
+        }, function (res) {})
+        // const token = '/ImP2frgV8ePu0xvUuYkNLTtsskj5yGwcxJCqkdMxrA='
+        // sStorage.set('token', token)
+        fetchData(apis.home, { accessToken: token, platform: this.isInWX ? '1' : '2' }).then(res => {
+          if (res.code === 0) {
+            this.banners = res.data.banners
+            this.farms = res.data.farms
+          }
+        })
+      })
+    }
   },
   methods: {
     goLiveDetail: function (item) {

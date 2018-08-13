@@ -8,7 +8,7 @@ import axios from 'axios'
 // }
 let baseUrl = '/'
 if (process.env.NODE_ENV === 'production') {
-  baseUrl = '/'
+  baseUrl = 'http://106.15.203.213:8444'
 }
 
 function fetcherCreator (url, userInfo) {

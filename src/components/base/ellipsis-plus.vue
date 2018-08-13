@@ -2,7 +2,7 @@
   <div class="ellipsis-plus" ref="container">
     <span class="ellipsis-plus-txt" ref="txt">中</span>
     <span class="ellipsis-plus-ellipsis" ref="ellipsis" :style="{'display':show?'none':'inline-block'}">{{ ellipsis }}</span>
-    <button class="ellipsis-plus-button" v-if="showButton" ref="more" @click="handleClick">{{ show ? collapseText: expandText }}</button>
+    <button class="ellipsis-plus-button" v-if="showButtonData" ref="more" @click="handleClick">{{ show ? collapseText: expandText }}</button>
   </div>
 </template>
 <script>
@@ -42,23 +42,25 @@ export default {
       tmpTxt: '',
       show: false,
       marginLeft: 0,
-      collapseMarginLeft: 0
+      collapseMarginLeft: 0,
+      showButtonData: this.showButton,
+      lineData: this.line
     }
   },
   created () {
   },
   mounted () {
-    if (!this.line) {
+    if (!this.lineData) {
       return
     }
-    this.line += 1
+    this.lineData += 1
     let everywidth = this.$refs.txt.offsetWidth
     this.$refs.txt.innerHTML = this.text
     let containerWidth = this.$refs.container.offsetWidth
     let btnWidth = 0
     let btnWidthExpand = 0
     let ellipsisWidth = this.$refs.ellipsis.offsetWidth
-    if (this.showButton) {
+    if (this.showButtonData) {
       btnWidthExpand = btnWidth = Math.ceil(parseFloat(getComputedStyle(this.$refs.more, null)['width'].replace('px', '')))
       this.$refs.ellipsis.style.display = 'none'
       let left = 0
@@ -83,16 +85,16 @@ export default {
     let style = getComputedStyle(this.$refs.container, null)
     let lineHeight = parseFloat(style['lineHeight'].replace('px', ''))
     this.$refs.txt.innerHTML = this.text
-    if (Math.floor(this.$refs.container.offsetHeight / lineHeight) <= this.line) {
+    if (Math.floor(this.$refs.container.offsetHeight / lineHeight) <= this.lineData) {
       this.tmpTxt = this.text
       this.show = true
-      this.showButton = false
+      this.showButtonData = false
       return
     }
-    let initNum = Math.floor((containerWidth * this.line - btnWidth - ellipsisWidth) / everywidth)
+    let initNum = Math.floor((containerWidth * this.lineData - btnWidth - ellipsisWidth) / everywidth)
     let increase = 1
     this.$refs.txt.innerHTML = this.text.substr(0, initNum)
-    if (Math.round(this.$refs.container.offsetHeight / lineHeight) > this.line) {
+    if (Math.round(this.$refs.container.offsetHeight / lineHeight) > this.lineData) {
       increase = -1
     }
     for (let i = initNum; i < this.text.length; (i = i + increase)) {
@@ -100,18 +102,18 @@ export default {
         return
       }
       this.$refs.txt.innerHTML = this.text.substr(0, i)
-      if (increase === 1 && Math.round(this.$refs.container.offsetHeight / lineHeight) > this.line) {
+      if (increase === 1 && Math.round(this.$refs.container.offsetHeight / lineHeight) > this.lineData) {
         this.tmpTxt = this.text.substr(0, i - 1)
         this.$refs.txt.innerHTML = this.tmpTxt
-        if (this.showButton) {
+        if (this.showButtonData) {
           let left = this.$refs.more.offsetLeft
           this.collapseMarginLeft = containerWidth - btnWidth - left - 1
         }
         break
-      } else if (increase === -1 && Math.round(this.$refs.container.offsetHeight / lineHeight) === this.line) {
+      } else if (increase === -1 && Math.round(this.$refs.container.offsetHeight / lineHeight) === this.lineData) {
         this.tmpTxt = this.text.substr(0, i)
         this.$refs.txt.innerHTML = this.tmpTxt
-        if (this.showButton) {
+        if (this.showButtonData) {
           let left = this.$refs.more.offsetLeft
           this.collapseMarginLeft = containerWidth - btnWidth - left - 1
         }
