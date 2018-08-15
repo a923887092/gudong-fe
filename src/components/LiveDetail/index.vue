@@ -3,19 +3,21 @@
     <mt-header v-if="!isInWX" class="live-header" fixed>
       <mt-button slot='left' icon='back' @click="goBack"><strong>{{ liveTitle }}</strong></mt-button>
     </mt-header>
-    <div  :class="isInWX ? 'live-content in-wx' : 'live-content'">
+    <div :class="isInWX ? 'live-content in-wx' : 'live-content'">
       <video
         webkit-playsinline="true"
+        x5-video-player-type="h5"
+        x5-video-player-fullscreen="true"
+        x-webkit-airplay="allow"
         ref="video"
         playsinline
         id="my_video_player"
         class="video-style video-js vjs-default-skin vjs-big-play-centered"
         data-setup='{}'
       >
-        <source :src="videoDetail.videoUrl" type="application/x-mpegURL" />
       </video>
-      <div class="video-tag">
-        {{ '直播中' }}
+      <div v-show="!!videoDetail" :class="videoDetail.videoStatus + '' === '1' ? 'video-tag' : 'video-tag error'">
+        {{ videoDetail.videoStatus + '' === '1' ? '直播中' : '直播异常' }}
       </div>
       <div v-show="videoControlStatus" class="video-controls">
         <div class="video-controls-left">
@@ -49,7 +51,7 @@
     <div class="live-owner">
       <img class="live-owner-img" :src="plantInfo.farmerPic" />
       <div class="live-owner-data">
-        <audio style="display: none" id="audioTag" :src="plantInfo.farmerSay" ></audio>
+        <audio style="display: none" id="audioTag" :src="plantInfo.farmerSound" ></audio>
         <div class="live-owner-data-content">
           <div>
             <span>农户寄语</span>
@@ -78,8 +80,8 @@
     <div class="farm-product">
       <span>农场产品</span>
       <ul>
-        <li v-for="(item) in farmInfo.farmGoods || []" :key="item.goodsNo" @click="handleGoodsClick(item)">
-          <div class="farm-pro-img"><img :src="item.goodsImg" /></div>
+        <li v-for="(item) in farmInfo.farmGoods || []" :key="item.goodsNo">
+          <div @click="handleGoProduct(item.mallNo)" class="farm-pro-img"><img :src="item.goodsImg" /></div>
           <div>{{ item.goodsName }}</div>
         </li>
         <!-- <li>
@@ -150,12 +152,12 @@
             <span>农场还没有添加说明，请稍后查看～</span>
           </div>
           <div v-show="farmInfo.farmInfoUrl || farmInfo.farmInfoVideo">
-            <div class="farm-video">
+            <div v-show="false" class="farm-video">
               <!-- <div class="farm-video-init">
                 <img src="http://yun.it7090.com/video/XHLaunchAd/video01.mp4?vframe/jpg/offset/3" />
                 <img src="@/assets/icon_video_play.png"/>
               </div> -->
-              <video
+              <!-- <video
                 v-show="farmInfo.farmInfoVideo"
                 :src="farmInfo.farmInfoVideo"
                 controls="controls"
@@ -166,17 +168,17 @@
                 playsinline="true"
                 :poster="farmInfo.farmInfoVideo + '?vframe/jpg/offset/3'"
               >
-              </video>
+              </video> -->
             </div>
             <div style="display: flex; justify-content: space-between; align-items: center;">
               <img class="farm-content-divide" src="../../assets/img_detail_title_left.png"/>
               <span class="farm-content-title">农场介绍</span>
               <img class="farm-content-divide" src="../../assets/img_detail_title_right.png"/>
             </div>
-            <img :src="farmInfo.farmInfoUrl" />
+            <img class="farm-conten-info-url" :src="farmInfo.farmInfoUrl" />
             <div class="farm-content-info-btn">
-              <mt-button class="farm-content-info-buy" type="primary">选购农产品</mt-button>
-              <mt-button class="farm-content-info-plant" type="primary">直接认种</mt-button>
+              <mt-button @click="handleBuyPro" class="farm-content-info-buy" type="primary">选购农产品</mt-button>
+              <mt-button @click="handlePlant" class="farm-content-info-plant" type="primary">直接认种</mt-button>
             </div>
           </div>
         </mt-tab-container-item>
@@ -253,8 +255,11 @@ export default {
           autoplay: false,
           preload: 'auto',
           loop: false
-          // 
         }, function () {
+        })
+        this.player.src({
+          src: res.data.detail.videoUrl,
+          type: 'application/x-mpegURL'
         })
         this.messageRead(res.data.message.map(item => item.messageNo))
         if (this.isInWX) {
@@ -273,13 +278,13 @@ export default {
               }
             )
             wx.onMenuShareTimeline({
-              title: '强势围观 | 已有' + res.data.plant.saleCount + '人，花费' + share.price + '元成为***（农场名称）的农场主',
+              title: '强势围观 | 已有' + res.data.plant.saleCount + '人，花费' + share.price + '元成为' + res.data.detail.farmName + '的农场主',
               link: 'http://mall.91ncp.com.cn/?isShare=1#/',
               imgUrl: 'http://img.zcool.cn/community/0117e2571b8b246ac72538120dd8a4.jpg@1280w_1l_2o_100sh.jpg',
               success: function () {}
             })
             wx.onMenuShareAppMessage({
-              title: '强势围观 | 已有' + res.data.plant.saleCount + '人，花费' + share.price + '元成为***（农场名称）的农场主',
+              title: '强势围观 | 已有' + res.data.plant.saleCount + '人，花费' + share.price + '元成为' + res.data.detail.farmName + '的农场主',
               desc: '您的好友' + share.nickName + '已成为' + res.data.detail.farmName + '的农场主，一起来看看吧 ~',
               link: 'http://mall.91ncp.com.cn/?isShare=1#/',
               imgUrl: 'http://img.zcool.cn/community/0117e2571b8b246ac72538120dd8a4.jpg@1280w_1l_2o_100sh.jpg',
@@ -289,9 +294,9 @@ export default {
               }
             })
             wx.onMenuShareQQ({
-              title: '强势围观 | 已有' + res.data.plant.saleCount + '人，花费' + share.price + '元成为***（农场名称）的农场主',
+              title: '强势围观 | 已有' + res.data.plant.saleCount + '人，花费' + share.price + '元成为' + res.data.detail.farmName + '的农场主',
               desc: '您的好友' + share.nickName + '已成为' + res.data.detail.farmName + '的农场主，一起来看看吧 ~',
-              link: 'http://mall.91ncp.com.cn/?isShare=1#/',
+              link: 'http://mall.91ncp.com.cn/?#/',
               imgUrl: 'http://img.zcool.cn/community/0117e2571b8b246ac72538120dd8a4.jpg@1280w_1l_2o_100sh.jpg',
               success: function () {
               }
@@ -424,8 +429,11 @@ export default {
     handlePlant () {
       this.$router.push({ path: '/plant/' + this.plantInfo.plantNo })
     },
-    handleGoodsClick (goods) {
-      // TODO
+    handleBuyPro () {
+      location.href = 'https://h5.youzan.com/v2/showcase/feature?alias=xntv0G9Twq'
+    },
+    handleGoProduct (mallNo) {
+      location.href = 'https://h5.youzan.com/v2/goods/' + mallNo
     },
     handleMessageClick () {
       this.$router.push({ path: '/comment/' + this.farmNo })

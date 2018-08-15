@@ -19,17 +19,18 @@
         <div class="list-item-img">
           <img v-show="!!item.isRecommand" class="list-item-tag" src="../assets/img_label_recommend.png"/>
           <img v-lazy.container="item.farmImg" style="width: 100%; height: 100%;" />
-          <div class="list-item-img-people">
+          <div v-show="item.videos" class="list-item-img-people">
             <div class="liip-img">
-              <img :style="'left: ' + ii * 14 + 'px; z-index: ' + (10 - i)" v-for="(i, ii) in 10" src="http://img.zcool.cn/community/0117e2571b8b246ac72538120dd8a4.jpg@1280w_1l_2o_100sh.jpg" :key="ii"/>
+              <img :style="'left: ' + ii * 14 + 'px; z-index: ' + (10 - i)" v-for="(i, ii) in item.headImgs" :src="i" :key="ii"/>
             </div>
             <div class="liip-text">{{ videosNum(item.videos) + ' 观看' }}</div>
           </div>
         </div>
         <div class="list-item-title-container">
           <span class="list-item-title">{{ item.farmName }}</span>
-          <span :class="!!item.videoStatus ? 'list-item-living' : 'list-item-living error'">
-            {{ !!item.videoStatus ? '直播中' : '直播异常' }}
+          <span :class="item.videoStatus + '' === '1' ? 'list-item-living' : 'list-item-living error'">
+            <img :src="item.videoStatus + '' === '1' ? require('@/assets/living.gif') : require('@/assets/icon_abnormal.png')"/>
+            {{ item.videoStatus + '' === '1' ? '直播中' : '直播异常' }}
           </span>
         </div>
         <div class="list-item-info">
@@ -94,18 +95,11 @@ export default {
   mounted () {
     const vm = this
     const params = { platform: '2' }
-    const { code, state } = paramsUtils.url2json(location)
-    if (state && state.startsWith('{')) {
-      if (JSON.parse(state).farmNo) {
-        const { farmNo, farmName } = JSON.parse(state)
-        vm.$router.push({ path: '/live/' + farmNo + '/detail/' + farmName })
-      }
-    }
+    const { code } = paramsUtils.url2json(location)
     if (this.isInWX) {
       params.code = code
       params.platform = '1'
     }
-    // const code = paramsUtils.url2json(location).code
     params.code = code
     document.title = '种植基地'
     if (sStorage.get('token')) {
@@ -160,7 +154,7 @@ export default {
               wx.onMenuShareQQ({
                 title,
                 desc: '您的好友' + nickName + '邀您一起来看看吧 ~',
-                link: 'http://mall.91ncp.com.cn/?isShare=1#/',
+                link: 'http://mall.91ncp.com.cn/?#/',
                 imgUrl: 'http://img.zcool.cn/community/0117e2571b8b246ac72538120dd8a4.jpg@1280w_1l_2o_100sh.jpg',
                 success: function () {
                 }
@@ -286,9 +280,16 @@ export default {
   font-family: PingFangSC-Regular, sans-serif;
   font-size: 12px;
   color: rgba(20,186,114,1);
+  display: flex;
+}
+.list-item-living img {
+  width: 14px;
+  height: 14px;
+  margin-right: 3px;
 }
 .list-item-living.error {
   color: rgba(255,62,62,1);
+  align-items: center;
 }
 .list-item-info {
   width: 50%;

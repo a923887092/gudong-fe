@@ -53,6 +53,9 @@ export default {
     },
     handleAttention () {
       location.href = 'https://mp.weixin.qq.com/mp/profile_ext?action=home&__biz=MzIzNjc0MTg1OQ==&scene=124#wechat_redirect'
+    },
+    handleToShop () {
+      location.href = 'https://h5.youzan.com/v2/showcase/feature?alias=xntv0G9Twq'
     }
   }
 }
