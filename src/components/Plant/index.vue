@@ -37,7 +37,7 @@
           </div>
         </li>
       </ul>
-      <div class="plant-btn">
+      <div class="plant-btn" style="position: fixed; bottom: 0; left: 0; right: 0">
         <mt-button class="plant-btn-style" type="primary" @click="handlePlant">立即认种</mt-button>
       </div>
     </div>
@@ -50,6 +50,7 @@ import storage from '@/utils/storage'
 import sStorage from '@/utils/sessionStorage'
 import apis from '@/components/base/api'
 import fetchData from '@/utils/fetch'
+const wx = require('weixin-js-sdk')
 export default {
   components: {
     [Ellipsis.name]: Ellipsis,
@@ -71,6 +72,11 @@ export default {
     const token = sStorage.get('token')
     const params = this.$route.params
     this.plantNo = params.plantNo
+    if (this.isInWX) {
+      this.$getJsConfig(location.href.split('#')[0], [], function () {
+        wx.hideAllNonBaseMenuItem()
+      })
+    }
     fetchData(apis.plantHis, { accessToken: token, plantNo: params.plantNo, platform: this.isInWX ? '1' : '2' }).then(res => {
       if (res.code === 0) {
         const { plantHis, ...plantData } = res.data

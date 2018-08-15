@@ -19,6 +19,12 @@
         <div class="list-item-img">
           <img v-show="!!item.isRecommand" class="list-item-tag" src="../assets/img_label_recommend.png"/>
           <img v-lazy.container="item.farmImg" style="width: 100%; height: 100%;" />
+          <div class="list-item-img-people">
+            <div class="liip-img">
+              <img :style="'left: ' + ii * 14 + 'px; z-index: ' + (10 - i)" v-for="(i, ii) in 10" src="http://img.zcool.cn/community/0117e2571b8b246ac72538120dd8a4.jpg@1280w_1l_2o_100sh.jpg" :key="ii"/>
+            </div>
+            <div class="liip-text">{{ videosNum(item.videos) + ' 观看' }}</div>
+          </div>
         </div>
         <div class="list-item-title-container">
           <span class="list-item-title">{{ item.farmName }}</span>
@@ -45,6 +51,7 @@ import 'swiper/dist/css/swiper.css'
 import fetchData from '@/utils/fetch'
 import paramsUtils from '@/utils/params'
 import apis from '@/components/base/api'
+const wx = require('weixin-js-sdk')
 
 Vue.use(Lazyload)
 
@@ -59,6 +66,7 @@ export default {
       wxIsReady: false,
       banners: [],
       farms: [],
+      share: {},
       swiperOption: {
         slidesPerView: 'auto',
         centeredSlides: true,
@@ -86,46 +94,96 @@ export default {
   mounted () {
     const vm = this
     const params = { platform: '2' }
+    const { code, state } = paramsUtils.url2json(location)
+    if (state && state.startsWith('{')) {
+      if (JSON.parse(state).farmNo) {
+        const { farmNo, farmName } = JSON.parse(state)
+        vm.$router.push({ path: '/live/' + farmNo + '/detail/' + farmName })
+      }
+    }
     if (this.isInWX) {
-      const code = paramsUtils.url2json(location).code
       params.code = code
       params.platform = '1'
     }
-    const code = paramsUtils.url2json(location).code
+    // const code = paramsUtils.url2json(location).code
     params.code = code
     document.title = '种植基地'
     if (sStorage.get('token')) {
-      fetchData(apis.home, { accessToken: sStorage.get('token'), platform: this.isInWX ? '1' : '2' }).then(res => {
-        if (res.code === 0) {
-          this.banners = res.data.banners
-          this.farms = res.data.farms
-        }
-      })
+      this.initComp(sStorage.get('token'))
     } else {
       fetchData('/api/gateway/auth/getToken', params).then(res => {
         const token = res.data.accessToken
         sStorage.set('token', token)
-        this.isInWX && this.$getJsConfig(location.href.split('#')[0], [], function () {
-          vm.wxIsReady = true
-        }, function (res) {})
-        // const token = '/ImP2frgV8ePu0xvUuYkNLTtsskj5yGwcxJCqkdMxrA='
-        // sStorage.set('token', token)
-        fetchData(apis.home, { accessToken: token, platform: this.isInWX ? '1' : '2' }).then(res => {
-          if (res.code === 0) {
-            this.banners = res.data.banners
-            this.farms = res.data.farms
-          }
-        })
+        this.initComp(token)
       })
     }
   },
   methods: {
+    initComp (token) {
+      const vm = this
+      fetchData(apis.home, { accessToken: token, platform: this.isInWX ? '1' : '2' }).then(res => {
+        if (res.code === 0) {
+          vm.banners = res.data.banners
+          vm.farms = res.data.farms
+          if (this.isInWX) {
+            const title = '只要' + res.data.share.price + '元，就能成为谷咚的农场主 ~ '
+            // const link = 'https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx650e30e3ec9bfd40&redirect_uri=http%3a%2f%2fmall.91ncp.com.cn&response_type=code&scope=snsapi_userinfo&state=#wechat_redirect'
+            this.$getJsConfig(location.href.split('#')[0], [], function () {
+              vm.wxIsReady = true
+              wx.hideAllNonBaseMenuItem()
+              wx.showMenuItems(
+                {
+                  menuList: [
+                    'menuItem:share:appMessage',
+                    'menuItem:share:timeline',
+                    'menuItem:share:qq'
+                  ]
+                }
+              )
+              const nickName = res.data.share.nickName
+              wx.onMenuShareTimeline({
+                title,
+                link: 'http://mall.91ncp.com.cn/?isShare=1#/',
+                imgUrl: 'http://img.zcool.cn/community/0117e2571b8b246ac72538120dd8a4.jpg@1280w_1l_2o_100sh.jpg',
+                success: function () {}
+              })
+              wx.onMenuShareAppMessage({
+                title,
+                desc: '您的好友' + nickName + '邀您一起来看看吧 ~',
+                link: 'http://mall.91ncp.com.cn/?isShare=1#/',
+                imgUrl: 'http://img.zcool.cn/community/0117e2571b8b246ac72538120dd8a4.jpg@1280w_1l_2o_100sh.jpg',
+                type: '',
+                dataUrl: '',
+                success: function () {
+                }
+              })
+              wx.onMenuShareQQ({
+                title,
+                desc: '您的好友' + nickName + '邀您一起来看看吧 ~',
+                link: 'http://mall.91ncp.com.cn/?isShare=1#/',
+                imgUrl: 'http://img.zcool.cn/community/0117e2571b8b246ac72538120dd8a4.jpg@1280w_1l_2o_100sh.jpg',
+                success: function () {
+                }
+              })
+            }, function (res) {})
+          }
+        }
+      })
+    },
+    wxShare (title, link, nickName) {
+    },
     goLiveDetail: function (item) {
       this.$router.push({ path: '/live/' + item.farmNo + '/detail/' + item.farmName })
     },
     bannerClick (targetUrl) {
       // TODO: targetUrl
       this.$router.push({ path: '/PersonCenter' })
+    },
+    videosNum (videos) {
+      if (videos > 999) {
+        return Math.floor(videos / 1000) + 'k'
+      }
+      return videos
     }
   }
 }
@@ -172,6 +230,37 @@ export default {
   height: 135px;
   overflow: hidden;
   position: relative;
+}
+.list-item-img .list-item-img-people {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 30px;
+  width: 276px;
+  background: rgba(0,0,0,0.4);
+  border-top-right-radius: 15px;
+  border-bottom-right-radius: 15px;
+  padding: 0 15px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between
+}
+.list-item-img .list-item-img-people .liip-img {
+  height: 18px;
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+.list-item-img .list-item-img-people .liip-text {
+  font-size: 12px;
+  font-family: PingFangSC-Regular;
+  color: rgba(255,255,255,1);
+}
+.list-item-img .list-item-img-people .liip-img img {
+  width: 18px;
+  height: 18px;
+  border-radius: 9px;
+  position: absolute;
 }
 .list-item-tag {
   position: absolute;

@@ -245,6 +245,16 @@
 }
 .farm-tab-container {
   margin: 25px 20px 0 20px;
+  ul {
+    li:last-child {
+      background: #ffffff;
+      height: 40px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: #39e590;
+    }
+  }
 }
 .comment-img {
   width: 36px;
@@ -387,6 +397,9 @@
   font-size: 12px;
   font-family: PingFangSC-Regular;
   color: rgba(153,153,153,1);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
 }
 .farm-tab-nodata {
   display: flex;

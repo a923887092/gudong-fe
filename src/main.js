@@ -10,6 +10,7 @@ import sStorage from './utils/sessionStorage'
 import fetchData from './utils/fetch'
 import apis from './components/base/api'
 import crypto from 'crypto'
+import paramsUtils from '@/utils/params'
 const wx = require('weixin-js-sdk')
 
 Vue.config.productionTip = false
@@ -39,6 +40,22 @@ const init = function () {
 }
 
 if (browser.versions.wx) {
+  const { isShare } = paramsUtils.url2json(location)
+  // if (state && code) {
+  //   const [ farmNo, farmName ] = state.split('__')
+  //   location.href = 'http://mall.91ncp.com.cn/?#/live/' + farmNo + '/detail/' + farmName
+  // } else if (isShare + '' === '1') {
+  //   if (farmNo) {
+  //     const state = farmNo + '__' + farmName
+  //     location.href = 'https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx650e30e3ec9bfd40&redirect_uri=http%3a%2f%2fmall.91ncp.com.cn&response_type=code&scope=snsapi_userinfo&state=' + state + '#wechat_redirect'
+  //   } else {
+  //     location.href = 'https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx650e30e3ec9bfd40&redirect_uri=http%3a%2f%2fmall.91ncp.com.cn&response_type=code&scope=snsapi_userinfo&state=#wechat_redirect'
+  //   }
+  // } else {
+  // }
+  if (isShare + '' === '1') {
+    location.href = 'https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx650e30e3ec9bfd40&redirect_uri=http%3a%2f%2fmall.91ncp.com.cn&response_type=code&scope=snsapi_userinfo&state=#wechat_redirect'
+  }
   fetchData(apis.getTicket, { platform: '1' }).then(res => {
     if (res.code === 0) {
       sStorage.set('ticket', res.data.jsTicket)
@@ -66,12 +83,20 @@ if (browser.versions.wx) {
       Vue.prototype.$getJsConfig = function (url, exApiArr, ready, error) {
         const signatureObj = this.$genSignature(url)
         wx.config({
-          debug: true,
+          debug: false,
           appId: 'wx650e30e3ec9bfd40',
           timestamp: signatureObj.timestamp,
           nonceStr: signatureObj.nonceStr,
           signature: signatureObj.signature,
-          jsApiList: ['chooseWXPay', 'closeWindow'].concat(exApiArr)
+          jsApiList: [
+            'chooseWXPay',
+            'closeWindow',
+            'showMenuItems',
+            'hideAllNonBaseMenuItem',
+            'onMenuShareTimeline',
+            'onMenuShareAppMessage',
+            'onMenuShareQQ'
+          ].concat(exApiArr)
         })
         wx.ready(ready)
         wx.error(error)

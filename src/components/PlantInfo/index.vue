@@ -45,7 +45,7 @@ import region from '@/components/base/province'
 import sStorage from '@/utils/sessionStorage'
 import fetchData from '@/utils/fetch'
 import crypto from 'crypto'
-// const wx = require('weixin-js-sdk')
+const wx = require('weixin-js-sdk')
 
 export default {
   components: {
@@ -92,6 +92,11 @@ export default {
     const params = this.$route.params
     this.plantNo = params.plantNo
     this.plantPrice = params.plantPrice
+    if (this.isInWX) {
+      this.$getJsConfig(location.href.split('#')[0], [], function () {
+        wx.hideAllNonBaseMenuItem()
+      })
+    }
     // const vm = this
     // if (this.isInWX) {
     //   this.$getJsConfig(location.href, ['chooseWXPay'], function () {
@@ -254,7 +259,7 @@ export default {
       window.WeixinJSBridge.invoke(
         'getBrandWCPayRequest', {
           appId: data.appid,
-          timeStamp: data.timeStamp,
+          timeStamp: data.timeStamp + '',
           nonceStr: data.nonceStr,
           package: data.package,
           signType: data.signType,

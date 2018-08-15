@@ -4,9 +4,15 @@
       <mt-button slot='left' icon='back' @click="goBack"><strong>{{ liveTitle }}</strong></mt-button>
     </mt-header>
     <div  :class="isInWX ? 'live-content in-wx' : 'live-content'">
-      <video webkit-playsinline="true" ref="video" playsinline id="my_video_player" class="video-style video-js vjs-default-skin vjs-big-play-centered"
-  data-setup='{}'>
-        <source src="http://hls.open.ys7.com/openlive/322ce6a69dea42edb771566dee7869bf.m3u8 " type="application/x-mpegURL" />
+      <video
+        webkit-playsinline="true"
+        ref="video"
+        playsinline
+        id="my_video_player"
+        class="video-style video-js vjs-default-skin vjs-big-play-centered"
+        data-setup='{}'
+      >
+        <source :src="videoDetail.videoUrl" type="application/x-mpegURL" />
       </video>
       <div class="video-tag">
         {{ '直播中' }}
@@ -22,8 +28,8 @@
       </div>
     </div>
     <div class="race-progress-container">
-      <mt-progress class="race-progress" :value="plantInfo.saleCount ? parseInt(plantInfo.saleCount * 100 / plantInfo.targetCount) : 0" :bar-height="3">
-        <div slot="end">{{ (plantInfo.saleCount ? parseInt(plantInfo.saleCount * 100 / plantInfo.targetCount) : 0) + '%' }}</div>
+      <mt-progress class="race-progress" :value="Math.ceil(plantInfo.saleCount * 100 / plantInfo.targetCount)" :bar-height="3">
+        <div slot="end">{{ Math.ceil(plantInfo.saleCount * 100 / plantInfo.targetCount) + '%' }}</div>
       </mt-progress>
     </div>
     <div class="live-data-content">
@@ -43,7 +49,7 @@
     <div class="live-owner">
       <img class="live-owner-img" :src="plantInfo.farmerPic" />
       <div class="live-owner-data">
-        <audio style="display: none" id="audioTag" src="http://cdn.xxtao.com/cms/audio/yesterday_once_more.mp3" ></audio>
+        <audio style="display: none" id="audioTag" :src="plantInfo.farmerSay" ></audio>
         <div class="live-owner-data-content">
           <div>
             <span>农户寄语</span>
@@ -54,7 +60,7 @@
           </div>
         </div>
         <div class="controls">
-          <img @click="changeAudioState" class="play-pause" id="playPause" :src="audio.paused ? require('@/assets/icon_voice_play.png') : require('@/assets/icon_voice_stop.png') " />
+          <img @click="changeAudioState" class="play-pause" id="playPause" :src="!audioStatus ? require('@/assets/icon_voice_play.png') : require('@/assets/icon_voice_stop.png') " />
         </div>
       </div>
     </div>
@@ -88,7 +94,7 @@
         <mt-tab-item id="1">
           <div style="position: relative">
             <span>吐槽区</span>
-            <mt-badge v-show="!!newMessages" color="#FF3E3E" size="small" style="position: absolute; top: -9px; right: 9px">8</mt-badge>
+            <mt-badge v-show="!!newMessages" color="#FF3E3E" size="small" style="position: absolute; top: -9px; right: 9px">{{ newMessages }}</mt-badge>
           </div>
         </mt-tab-item>
         <mt-tab-item id="2">农场说明</mt-tab-item>
@@ -100,7 +106,7 @@
             <img src="@/assets/img_logo_nodata.png"/>
             <span>农场还没有吐槽，快来参加吐槽吧～</span>
           </div>
-          <ul v-show="message && message.length > 0" v-infinite-scroll="loadMore" :infinite-scroll-disabled="pageLoading" :infinite-scroll-distance="10">
+          <ul v-show="message && message.length > 0">
             <li
               v-for="(item) in message"
               :key="item.messageNo"
@@ -129,6 +135,10 @@
                 </div>
               </div>
             </li>
+            <li>
+              <mt-spinner v-show="pageLoading" type="fading-circle"></mt-spinner>
+              <span @click="loadMore" v-show="!pageLoading">{{ isAllData ? '已全部加载' : '显示更多...' }}</span>
+            </li>
           </ul>
           <div class="farm-comment-btn">
             <mt-button class="farm-comment-btn-style" type="primary" @click="handleMessageClick">吐槽</mt-button>
@@ -146,17 +156,15 @@
                 <img src="@/assets/icon_video_play.png"/>
               </div> -->
               <video
-                src="http://yun.it7090.com/video/XHLaunchAd/video01.mp4"
+                v-show="farmInfo.farmInfoVideo"
+                :src="farmInfo.farmInfoVideo"
                 controls="controls"
                 style="height: 100%"
                 autoplay="autoplay"
                 preload="auto"
                 webkit-playsinline="true"
                 playsinline="true"
-                x-webkit-airplay="allow"
-                x5-video-player-type="h5"
-                x5-video-player-fullscreen="true"
-                poster="http://yun.it7090.com/video/XHLaunchAd/video01.mp4?vframe/jpg/offset/3"
+                :poster="farmInfo.farmInfoVideo + '?vframe/jpg/offset/3'"
               >
               </video>
             </div>
@@ -180,7 +188,7 @@
           <div class="plant-people" v-show="plantHis && plantHis.length > 0">
             <div v-for="(item, i) in plantHis" class="plant-people-item" :key="i">
               <img :src="item.headImg"/>
-              <div>{{ userName }}</div>
+              <div>{{ item.userName }}</div>
             </div>
           </div>
         </mt-tab-container-item>
@@ -193,7 +201,7 @@
   </div>
 </template>
 <script>
-import { Header, Button, Progress, Navbar, TabItem, TabContainer, TabContainerItem, Badge, InfiniteScroll } from 'mint-ui'
+import { Spinner, Header, Button, Progress, Navbar, TabItem, TabContainer, TabContainerItem, Badge, InfiniteScroll } from 'mint-ui'
 // import './custom-theme.css'
 import Vue from 'vue'
 import Ellipsis from '../base/ellipsis-plus'
@@ -202,6 +210,7 @@ import sStorage from '@/utils/sessionStorage'
 import apis from '@/components/base/api'
 import fetchData from '@/utils/fetch'
 import moment from 'moment'
+const wx = require('weixin-js-sdk')
 // const wx = require('weixin-js-sdk')
 
 Vue.use(InfiniteScroll)
@@ -239,9 +248,59 @@ export default {
         vm.farmInfo = res.data.farmInfo
         vm.message = res.data.message
         vm.plantHis = res.data.plantHis
+        this.player = window.videojs('my_video_player', {
+          controls: false,
+          autoplay: false,
+          preload: 'auto',
+          loop: false
+          // 
+        }, function () {
+        })
+        this.messageRead(res.data.message.map(item => item.messageNo))
+        if (this.isInWX) {
+          const share = res.data.share
+          // const urlArr = location.href.split('#').splice(0, 1)
+          // const url = urlArr.join('#')
+          this.$getJsConfig(location.href.split('#')[0], [], function () {
+            wx.hideAllNonBaseMenuItem()
+            wx.showMenuItems(
+              {
+                menuList: [
+                  'menuItem:share:appMessage',
+                  'menuItem:share:timeline',
+                  'menuItem:share:qq'
+                ]
+              }
+            )
+            wx.onMenuShareTimeline({
+              title: '强势围观 | 已有' + res.data.plant.saleCount + '人，花费' + share.price + '元成为***（农场名称）的农场主',
+              link: 'http://mall.91ncp.com.cn/?isShare=1#/',
+              imgUrl: 'http://img.zcool.cn/community/0117e2571b8b246ac72538120dd8a4.jpg@1280w_1l_2o_100sh.jpg',
+              success: function () {}
+            })
+            wx.onMenuShareAppMessage({
+              title: '强势围观 | 已有' + res.data.plant.saleCount + '人，花费' + share.price + '元成为***（农场名称）的农场主',
+              desc: '您的好友' + share.nickName + '已成为' + res.data.detail.farmName + '的农场主，一起来看看吧 ~',
+              link: 'http://mall.91ncp.com.cn/?isShare=1#/',
+              imgUrl: 'http://img.zcool.cn/community/0117e2571b8b246ac72538120dd8a4.jpg@1280w_1l_2o_100sh.jpg',
+              type: '',
+              dataUrl: '',
+              success: function () {
+              }
+            })
+            wx.onMenuShareQQ({
+              title: '强势围观 | 已有' + res.data.plant.saleCount + '人，花费' + share.price + '元成为***（农场名称）的农场主',
+              desc: '您的好友' + share.nickName + '已成为' + res.data.detail.farmName + '的农场主，一起来看看吧 ~',
+              link: 'http://mall.91ncp.com.cn/?isShare=1#/',
+              imgUrl: 'http://img.zcool.cn/community/0117e2571b8b246ac72538120dd8a4.jpg@1280w_1l_2o_100sh.jpg',
+              success: function () {
+              }
+            })
+          })
+        }
       }
     })
-    setInterval(() => {
+    this.refreshInt = setInterval(() => {
       fetchData(apis.refresh, { accessToken: token, farmNo: params.liveId, platform: this.isInWX ? '1' : '2' }).then(res => {
         if (res.code === 0) {
           vm.newMessages = res.data.newMessages
@@ -249,28 +308,13 @@ export default {
           vm.plantInfo.saleCount = res.data.saleCount
           vm.plantInfo.peopleCount = res.data.peopleCount
           vm.videoDetail.videoStatus = res.data.videoStatus
+          if (res.data.newMessages > 0) {
+            vm.isAllData = false
+          }
         }
       })
     }, 5000)
     console.log(this.$router)
-    this.player = window.videojs('my_video_player', {
-      controls: false,
-      autoplay: false,
-      preload: 'auto',
-      loop: false
-      // controlBar: {
-      //   remainingTimeDisplay: false,
-      //   // progressControl: false,
-      //   volumePanel: false
-      // }
-    }, function () {
-      // const newBtn = document.createElement('button')
-      // newBtn.className = 'ext-vjs-controls-btn vjs-controls'
-      // newBtn.innerHTML = '1'
-      // const controlBar = document.getElementsByClassName('vjs-control-bar')[0]
-      // const insertBeforeNode = document.getElementsByClassName('vjs-fullscreen-control')[0]
-      // controlBar.insertBefore(newBtn, insertBeforeNode)
-    })
     window.smoothscroll = () => {
       let currentScroll = document.documentElement.scrollTop || document.body.scrollTop
       if (currentScroll > 0) {
@@ -282,6 +326,7 @@ export default {
   },
   destroyed () {
     this.player.dispose()
+    this.refreshInt && clearInterval(this.refreshInt)
     window.removeEventListener('scroll', this.catchScroll)
   },
   data () {
@@ -300,7 +345,10 @@ export default {
       newMessages: 0,
       currentPage: 1,
       plantHis: [],
-      pageLoading: false
+      pageLoading: false,
+      audioStatus: false,
+      refreshInt: null,
+      isAllData: false
     }
   },
   beforeRouteEnter (to, from, next) {
@@ -323,6 +371,7 @@ export default {
     [TabContainerItem.name]: TabContainerItem,
     [Ellipsis.name]: Ellipsis,
     [Badge.name]: Badge,
+    [Spinner.name]: Spinner,
     // [InfiniteScroll.name]: InfiniteScroll,
     [Button.name]: Button
   },
@@ -384,45 +433,60 @@ export default {
     changeAudioState () {
       if (this.audio.paused) {
         this.audio.play()
+        this.audioStatus = true
       } else {
         this.audio.pause()
+        this.audioStatus = false
       }
     },
     updateProgress () {
       const value = Math.round((Math.floor(this.audio.currentTime) / Math.floor(this.audio.duration)) * 100, 0)
-      this.audioProgress = value * 0.907
+      this.audioProgress = value
+      if (value + '' === '100') {
+        this.audio.pause()
+        this.audio.currentTime = 0
+        this.audioStatus = false
+      }
     },
     handleFullscreen () {
-      // consst element = this.player
-      // element.requestFullscreen()
-      // if (element.requestFullscreen) {
-      //   element.requestFullscreen()
-      // } else if (element.mozRequestFullScreen) {
-      //   element.mozRequestFullScreen()
-      // } else if (element.webkitRequestFullscreen) {
-      //   element.webkitRequestFullscreen()
-      // } else if (element.msRequestFullscreen) {
-      //   element.msRequestFullscreen()
-      // }
+      const element = this.player
+      element.requestFullscreen()
+      if (element.requestFullscreen) {
+        element.requestFullscreen()
+      } else if (element.mozRequestFullScreen) {
+        element.mozRequestFullScreen()
+      } else if (element.webkitRequestFullscreen) {
+        element.webkitRequestFullscreen()
+      } else if (element.msRequestFullscreen) {
+        element.msRequestFullscreen()
+      }
     },
     loadMore () {
+      if (this.isAllData) {
+        return
+      }
       const vm = this
       const params = this.$route.params
       const token = sStorage.get('token')
-      this.pageLoading = true
-      fetchData(apis.messageLoad, { currentPage: this.currentPage + 1, accessToken: token, farmNo: params.liveId, platform: this.isInWX ? '1' : '2' }).then(res => {
+      !this.isAllData && !this.pageLoading && fetchData(apis.messageLoad, { currentPage: this.currentPage + 1, accessToken: token, farmNo: params.liveId, platform: this.isInWX ? '1' : '2' }).then(res => {
         if (res.code === 0) {
-          vm.message = vm.message.concat(res.data.result)
-          vm.currentPage += 1
+          vm.message = [...vm.message, ...res.data.result]
+          if (res.data.result && res.data.result.length > 0) {
+            vm.currentPage = res.data.page.currentPage
+          } else {
+            vm.currentPage = res.data.page.currentPage - 1
+            vm.isAllData = true
+          }
           this.pageLoading = false
           vm.messageRead(res.data.result.map(item => item.messageNo))
         }
       })
+      this.pageLoading = true
     },
-    messageRead (messageNo) {
+    messageRead (messageNos) {
       const params = this.$route.params
       const token = sStorage.get('token')
-      fetchData(apis.messageRead, { messageNo, accessToken: token, farmNo: params.liveId, platform: this.isInWX ? '1' : '2' }).then(res => {
+      fetchData(apis.messageRead, { messageNos, accessToken: token, farmNo: params.liveId, platform: this.isInWX ? '1' : '2' }).then(res => {
         if (res.code === 0) {
         }
       })

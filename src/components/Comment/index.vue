@@ -28,6 +28,7 @@ import sStorage from '@/utils/sessionStorage'
 import * as qiniu from 'qiniu-js'
 import fetchData from '@/utils/fetch'
 import apis from '@/components/base/api'
+const wx = require('weixin-js-sdk')
 export default {
   components: {
     [Field.name]: Field,
@@ -44,6 +45,11 @@ export default {
   },
   mounted () {
     document.title = '吐槽'
+    if (this.isInWX) {
+      this.$getJsConfig(location.href.split('#')[0], [], function () {
+        wx.hideAllNonBaseMenuItem()
+      })
+    }
     fetchData(apis.getUploadToken, { platform: this.isInWX ? '1' : '2' }).then(res => {
       if (res.code === 0) {
         this.token = res.data.upToken
@@ -93,7 +99,12 @@ export default {
       }
       fetchData(apis.message, params).then(res => {
         if (res.code === 0) {
-          this.token = res.data.upToken
+          history.go(-1)
+        } else {
+          Toast({
+            message: '发表失败！请稍后再试',
+            position: 'bottom'
+          })
         }
       })
     },

@@ -64,6 +64,7 @@ import fetchData from '@/utils/fetch'
 import apis from '@/components/base/api'
 import sStorage from '@/utils/sessionStorage'
 import storage from '@/utils/storage'
+const wx = require('weixin-js-sdk')
 
 export default {
   data () {
@@ -81,6 +82,11 @@ export default {
   },
   mounted () {
     this.getDataList('0')
+    if (this.isInWX) {
+      this.$getJsConfig(location.href.split('#')[0], [], function () {
+        wx.hideAllNonBaseMenuItem()
+      })
+    }
   },
   methods: {
     getDataList (status) {
