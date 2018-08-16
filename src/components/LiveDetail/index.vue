@@ -261,6 +261,8 @@ export default {
           src: res.data.detail.videoUrl,
           type: 'application/x-mpegURL'
         })
+        this.player.load()
+        // this.player.play()
         this.messageRead(res.data.message.map(item => item.messageNo))
         if (this.isInWX) {
           const share = res.data.share

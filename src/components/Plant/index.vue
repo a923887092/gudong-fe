@@ -11,6 +11,7 @@
       </div>
       <div class="plant-content">
         <ellipsis-plus
+          v-if="plantData.plantInfo"
           ref="noButton"
           :text="plantData.plantInfo || ''"
           :line="3"
