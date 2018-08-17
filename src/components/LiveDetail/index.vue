@@ -282,14 +282,14 @@ export default {
             wx.onMenuShareTimeline({
               title: '强势围观 | 已有' + res.data.plant.saleCount + '人，花费' + share.price + '元成为' + res.data.detail.farmName + '的农场主',
               link: 'http://mall.91ncp.com.cn/?isShare=1#/',
-              imgUrl: 'http://img.zcool.cn/community/0117e2571b8b246ac72538120dd8a4.jpg@1280w_1l_2o_100sh.jpg',
+              imgUrl: res.data.detail.shareImg,
               success: function () {}
             })
             wx.onMenuShareAppMessage({
               title: '强势围观 | 已有' + res.data.plant.saleCount + '人，花费' + share.price + '元成为' + res.data.detail.farmName + '的农场主',
               desc: '您的好友' + share.nickName + '已成为' + res.data.detail.farmName + '的农场主，一起来看看吧 ~',
               link: 'http://mall.91ncp.com.cn/?isShare=1#/',
-              imgUrl: 'http://img.zcool.cn/community/0117e2571b8b246ac72538120dd8a4.jpg@1280w_1l_2o_100sh.jpg',
+              imgUrl: res.data.detail.shareImg,
               type: '',
               dataUrl: '',
               success: function () {
@@ -299,7 +299,7 @@ export default {
               title: '强势围观 | 已有' + res.data.plant.saleCount + '人，花费' + share.price + '元成为' + res.data.detail.farmName + '的农场主',
               desc: '您的好友' + share.nickName + '已成为' + res.data.detail.farmName + '的农场主，一起来看看吧 ~',
               link: 'http://mall.91ncp.com.cn/?#/',
-              imgUrl: 'http://img.zcool.cn/community/0117e2571b8b246ac72538120dd8a4.jpg@1280w_1l_2o_100sh.jpg',
+              imgUrl: res.data.detail.shareImg,
               success: function () {
               }
             })

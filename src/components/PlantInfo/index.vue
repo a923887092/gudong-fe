@@ -145,6 +145,12 @@ export default {
           position: 'bottom',
           className: 'plant-info-toast'
         })
+      } else if (!this.checked) {
+        Toast({
+          message: '请勾选认种协议',
+          position: 'bottom',
+          className: 'plant-info-toast'
+        })
       } else {
         // console.log('pay:' + JSON.stringify(this))
         // console.log('pay1:' + this)

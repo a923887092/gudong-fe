@@ -13,7 +13,7 @@
         <img class="comment-img-item-content" src="../../assets/button_add.png"/>
       </div>
       <input id="petCamera" type="file" accept="image/*" capture="camera" style="display: none;" @change="readFile($event)">
-      <input id="petPhoto" type="file"  accept="image/*" style="display: none;" @change="readFile($event)">
+      <input multiple id="petPhoto" type="file"  accept="image/*" style="display: none;" @change="readFile($event)">
       <div class="comment-btn">
         <mt-button class="comment-btn-style" type="primary" @click="handleMessageClick">发表</mt-button>
       </div>
@@ -62,21 +62,19 @@ export default {
     },
     readFile (source) {
       let vm = this
-      let file = source.target.files[0]
-      let reader = new FileReader()
-      reader.readAsDataURL(file)
-      reader.onloadend = function (e) {
-        // let re = this.result
-        // vm.canvasDataURL(re, source, file)
-        vm.handleStartUpload(file)
-        // vm.UploadToOss({ vm, file }).then((data) => {
-        //   vm.$set(vm.fieldForm.petInfo, 'avatar', data.res.requestUrls[0].split('?')[0])
-        //   source.target.value = null
-        // }).catch((res) => {
-        //   Toast('上传图片失败')
-        //   source.target.value = null
-        //   vm.$set(vm.fieldForm.petInfo, 'avatar', '')
-        // })
+      const files = source.target.files
+      const num = 9 - this.uploadImgs.length
+      let len = files.length
+      if (len > num) {
+        len = num
+      }
+      for (let i = 0; i < len; i++) {
+        const item = files[i]
+        let reader = new FileReader()
+        reader.readAsDataURL(item)
+        reader.onloadend = function (e) {
+          vm.handleStartUpload(item)
+        }
       }
     },
     handleBack () {
@@ -114,6 +112,13 @@ export default {
       if (!this.token) {
         Toast({
           message: '服务未准备好，请稍后再试！',
+          position: 'bottom'
+        })
+        return
+      }
+      if (!file.type.startsWith('image')) {
+         Toast({
+          message: '请选择图片上传',
           position: 'bottom'
         })
         return
