@@ -110,6 +110,7 @@
           </div>
           <ul v-show="message && message.length > 0">
             <li
+              class="farm-comment-li"
               v-for="(item) in message"
               :key="item.messageNo"
               style="display: flex; border-bottom: 1px rgba(231,231,231,1) solid"
@@ -131,7 +132,7 @@
                   </div>
                   <div class="comment-content-img-container">
                     <div class="comment-content-img" v-for="(imgUrl, index) in item.messageUrl" :key="index">
-                      <img :src="imgUrl" />
+                      <img @click="previewCommentImg(imgUrl, item.messageUrl)" :src="imgUrl" />
                     </div>
                   </div>
                 </div>
@@ -142,9 +143,6 @@
               <span @click="loadMore" v-show="!pageLoading">{{ isAllData ? '已全部加载' : '显示更多...' }}</span>
             </li>
           </ul>
-          <div class="farm-comment-btn">
-            <mt-button class="farm-comment-btn-style" type="primary" @click="handleMessageClick">吐槽</mt-button>
-          </div>
         </mt-tab-container-item>
         <mt-tab-container-item id="2">
           <div class="farm-tab-nodata" v-show="!farmInfo.farmInfoUrl && !farmInfo.farmInfoVideo">
@@ -200,6 +198,13 @@
       <div ref="backToTop" class="back-to-top" v-show="visible" @click="backToTop">
       </div>
     </transition>
+    <div v-show="bottomVisible && selected !== '3'" class="bottom-btn">
+      <mt-button v-show="selected === '1'" class="farm-comment-btn-style" type="primary" @click="handleMessageClick">吐槽</mt-button>
+      <div v-show="selected === '2'" class="farm-content-info-btn">
+        <mt-button @click="handleBuyPro" class="farm-content-info-buy" type="primary">选购农产品</mt-button>
+        <mt-button @click="handlePlant" class="farm-content-info-plant" type="primary">直接认种</mt-button>
+      </div>
+    </div>
   </div>
 </template>
 <script>
@@ -355,7 +360,8 @@ export default {
       pageLoading: false,
       audioStatus: false,
       refreshInt: null,
-      isAllData: false
+      isAllData: false,
+      bottomVisible: false
     }
   },
   beforeRouteEnter (to, from, next) {
@@ -427,6 +433,7 @@ export default {
     },
     catchScroll () {
       this.visible = (window.pageYOffset > 300)
+      this.bottomVisible = (window.pageYOffset > 740)
     },
     handlePlant () {
       this.$router.push({ path: '/plant/' + this.plantInfo.plantNo })
@@ -499,6 +506,12 @@ export default {
       fetchData(apis.messageRead, { messageNos, accessToken: token, farmNo: params.liveId, platform: this.isInWX ? '1' : '2' }).then(res => {
         if (res.code === 0) {
         }
+      })
+    },
+    previewCommentImg (url, urls) {
+      wx.previewImage({
+        current: url,
+        urls
       })
     }
   }

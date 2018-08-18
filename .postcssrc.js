@@ -8,7 +8,7 @@ module.exports = {
     "autoprefixer": {},
     "postcss-plugin-px2rem": {
       rootValue: 37.5,
-      propBlackList: ['border'],
+      propBlackList: ['border', 'fontSize'],
     }
   } 
 }

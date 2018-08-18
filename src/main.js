@@ -80,7 +80,8 @@ const beforFetch = function () {
               'hideAllNonBaseMenuItem',
               'onMenuShareTimeline',
               'onMenuShareAppMessage',
-              'onMenuShareQQ'
+              'onMenuShareQQ',
+              'previewImage'
             ].concat(exApiArr)
           })
           wx.ready(ready)
@@ -94,7 +95,6 @@ const beforFetch = function () {
   }
 }
 if (!sStorage.get('token')) {
-  const vm = this
   const params = { platform: '2' }
   const { code, isShare } = paramsUtils.url2json(location)
   if (browser.versions.wx) {
@@ -103,18 +103,17 @@ if (!sStorage.get('token')) {
   }
   if (isShare + '' === '1') {
     location.href = 'https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx650e30e3ec9bfd40&redirect_uri=http%3a%2f%2fmall.91ncp.com.cn&response_type=code&scope=snsapi_userinfo&state=#wechat_redirect'
+  } else {
+    fetchData('/api/gateway/auth/getToken', params).then(res => {
+      if (res.code !== 0) {
+        document.write('网络错误！')
+      } else {
+        const token = res.data.accessToken
+        sStorage.set('token', token)
+        beforFetch()
+      }
+    })
   }
-  fetchData('/api/gateway/auth/getToken', params).then(res => {
-    if (res.code !== 0) {
-      document.write('网络错误！')
-    } else {
-      const token = res.data.accessToken
-      sStorage.set('token', token)
-      beforFetch()
-    }
-  })
 } else {
   beforFetch()
 }
-
-
