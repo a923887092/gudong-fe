@@ -93,7 +93,6 @@ export default {
     swiperSlide
   },
   mounted () {
-    const vm = this
     const params = { platform: '2' }
     const { code } = paramsUtils.url2json(location)
     if (this.isInWX) {

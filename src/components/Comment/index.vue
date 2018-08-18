@@ -117,7 +117,7 @@ export default {
         return
       }
       if (!file.type.startsWith('image')) {
-         Toast({
+        Toast({
           message: '请选择图片上传',
           position: 'bottom'
         })
