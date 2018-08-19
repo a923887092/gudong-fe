@@ -30,21 +30,21 @@
       </div>
     </div>
     <div class="race-progress-container">
-      <mt-progress class="race-progress" :value="Math.ceil(plantInfo.saleCount * 100 / plantInfo.targetCount)" :bar-height="3">
+      <mt-progress class="race-progress" :value="Math.ceil(plantInfo.saleCount * 100 / plantInfo.targetCount)" :bar-height="4">
         <div slot="end">{{ Math.ceil(plantInfo.saleCount * 100 / plantInfo.targetCount) + '%' }}</div>
       </mt-progress>
     </div>
     <div class="live-data-content">
       <div class="live-data-item">
-        <span class="live-data-item-num">{{ plantInfo.targetCount }}</span>
+        <span class="live-data-item-num">{{ comdify(plantInfo.targetCount) }}</span>
         <span class="live-data-item-des">{{ plantInfo.targetUnit }}</span>
       </div>
       <div class="live-data-item">
-        <span class="live-data-item-num">{{ plantInfo.saleCount }}</span>
+        <span class="live-data-item-num">{{ comdify(plantInfo.saleCount) }}</span>
         <span class="live-data-item-des">{{ plantInfo.saleUnit }}</span>
       </div>
       <div class="live-data-item">
-        <span class="live-data-item-num">{{ plantInfo.peopleCount }}</span>
+        <span class="live-data-item-num">{{ comdify(plantInfo.peopleCount) }}</span>
         <span class="live-data-item-des">{{ plantInfo.peopleUnit }}</span>
       </div>
     </div>
@@ -76,8 +76,8 @@
     <div class="live-owner-btn">
       <mt-button class="live-owner-btn-style" type="primary" @click="handlePlant">邀你认种</mt-button>
     </div>
-    <img class="live-divider" src="../../assets/img_detail_separatorcolumn.png"/>
-    <div class="farm-product">
+    <img v-show="farmInfo.farmGoods && farmInfo.farmGoods.length > 0" class="live-divider" src="../../assets/img_detail_separatorcolumn.png"/>
+    <div v-show="farmInfo.farmGoods && farmInfo.farmGoods.length > 0" class="farm-product">
       <span>农场产品</span>
       <ul>
         <li v-for="(item) in farmInfo.farmGoods || []" :key="item.goodsNo">
@@ -174,10 +174,6 @@
               <img class="farm-content-divide" src="../../assets/img_detail_title_right.png"/>
             </div>
             <img class="farm-conten-info-url" :src="farmInfo.farmInfoUrl" />
-            <div class="farm-content-info-btn">
-              <mt-button @click="handleBuyPro" class="farm-content-info-buy" type="primary">选购农产品</mt-button>
-              <mt-button @click="handlePlant" class="farm-content-info-plant" type="primary">直接认种</mt-button>
-            </div>
           </div>
         </mt-tab-container-item>
         <mt-tab-container-item id="3">
@@ -258,7 +254,7 @@ export default {
         this.player = window.videojs('my_video_player', {
           controls: false,
           autoplay: false,
-          preload: 'auto',
+           preload: 'auto',
           loop: false
         }, function () {
         })
@@ -513,6 +509,18 @@ export default {
         current: url,
         urls
       })
+    },
+    comdify (n) {
+      if (n) {
+        n = n + ''
+        const re = /\d{1,3}(?=(\d{3})+$)/g
+        const n1 = n.replace(/^(\d+)((\.\d+)?)$/, function (s,s1,s2) {
+          return s1.replace(re,'$&,') + s2
+        })
+    　　return n1
+      } else {
+        return '0'
+      }
     }
   }
 }

@@ -43,7 +43,7 @@
 </template>
 
 <script>
-import { Header, Button, Swipe, SwipeItem, Lazyload, Cell, Spinner } from 'mint-ui'
+import { Header, Button, Swipe, SwipeItem, Lazyload, Spinner } from 'mint-ui'
 import { swiper, swiperSlide } from 'vue-awesome-swiper'
 import Vue from 'vue'
 import storage from '@/utils/storage'
@@ -87,7 +87,6 @@ export default {
     [Swipe.name]: Swipe,
     [SwipeItem.name]: SwipeItem,
     [Button.name]: Button,
-    [Cell.name]: Cell,
     [Spinner.name]: Spinner,
     swiper,
     swiperSlide
@@ -169,8 +168,7 @@ export default {
       this.$router.push({ path: '/live/' + item.farmNo + '/detail/' + item.farmName })
     },
     bannerClick (targetUrl) {
-      // TODO: targetUrl
-      this.$router.push({ path: '/PersonCenter' })
+      location.href = targetUrl
     },
     videosNum (videos) {
       if (videos > 999) {
@@ -228,7 +226,7 @@ export default {
   position: absolute;
   bottom: 0;
   left: 0;
-  height: 30px;
+  height: 31px;
   width: 276px;
   background: rgba(0,0,0,0.4);
   border-top-right-radius: 15px;
@@ -291,12 +289,10 @@ export default {
   align-items: center;
 }
 .list-item-info {
-  width: 50%;
   min-height: 20px;
   padding-left: 15px;
   display: flex;
   align-items: center;
-  justify-content: space-between;
 }
 .list-item-info-cell {
   min-height: 20px;
@@ -309,6 +305,10 @@ export default {
     margin-right: 6px;
   }
 }
+.list-item-info-cell:nth-child(1) {
+  margin-right: 44px;
+}
+
 .list-item-info-icon {
   height: 14px;
   width: 15px;

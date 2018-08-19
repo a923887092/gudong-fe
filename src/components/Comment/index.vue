@@ -157,9 +157,9 @@ export default {
     color: #000000;
   }
   &-field {
-    margin-top: 40px;
+    margin-top: 55px;
     &.in-wx {
-      margin-top: 0;
+      margin-top: 15px;
     }
   }
   .comment-btn {
