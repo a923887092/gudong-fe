@@ -14,8 +14,14 @@
       <swiper-slide class="swiper-slide"><img style="width: 100%; height: 100%;" src="https://ss0.baidu.com/94o3dSag_xI4khGko9WTAnF6hhy/image/h%3D300/sign=4a51c9cd7e8b4710d12ffbccf3ccc3b2/b64543a98226cffceee78e5eb5014a90f703ea09.jpg"/></swiper-slide> -->
       <!-- <div class="swiper-pagination" slot="pagination"></div> -->
     </swiper>
+    <div class="home-swipe-point">
+      <span v-for="(item, index) in banners" class="home-swipe-point-item" :key="index" :style="swipeSelected === index ? '' : 'background: rgba(216,216,216,1);'">
+        <img v-show="swipeSelected === index" src="@/assets/icon_home_sign.png" />
+      </span>
+    </div>
     <ul v-show="farms && farms.length > 0" class="home-list">
       <li v-for="(item ,index) in farms" :key="index" @click="goLiveDetail(item)">
+        <div v-show="item.status === 0" style="z-index: 200; position: absolute; top: 0; left: 0;  width: 100%; height: 100%; background: rgb(255, 255, 255, 0.3);"></div>
         <div class="list-item-img">
           <img v-show="!!item.isRecommand" class="list-item-tag" src="../assets/img_label_recommend.png"/>
           <img v-lazy.container="item.farmImg" style="width: 100%; height: 100%;" />
@@ -43,7 +49,7 @@
 </template>
 
 <script>
-import { Header, Button, Swipe, SwipeItem, Lazyload, Spinner } from 'mint-ui'
+import { Header, Button, Lazyload, Spinner } from 'mint-ui'
 import { swiper, swiperSlide } from 'vue-awesome-swiper'
 import Vue from 'vue'
 import storage from '@/utils/storage'
@@ -61,6 +67,7 @@ export default {
   created () {
   },
   data: function () {
+    const vm = this
     return {
       loading: false,
       isInWX: storage.get('isInWX'),
@@ -68,24 +75,24 @@ export default {
       banners: [],
       farms: [],
       share: {},
+      swipeSelected: 0,
       swiperOption: {
         slidesPerView: 'auto',
+        initialSlide: 0,
         centeredSlides: true,
         spaceBetween: 5,
         loop: false,
-        pagination: {
-          el: '.swiper-pagination',
-          bulletActiveClass: 'my-bullet-active',
-          bulletClass: 'my-bullet',
-          clickable: true
+        autoplay: true,
+        on:{
+          slideChange: function () {
+            vm.swipeSelected = this.activeIndex
+          }
         }
       }
     }
   },
   components: {
     [Header.name]: Header,
-    [Swipe.name]: Swipe,
-    [SwipeItem.name]: SwipeItem,
     [Button.name]: Button,
     [Spinner.name]: Spinner,
     swiper,
@@ -210,11 +217,36 @@ export default {
   width: 345px;
   // background-color: #57a2e7;
 }
+.home-swipe-point {
+  display: flex;
+  justify-content: center;
+  // align-items: flex-end;
+  height: 8px;
+  margin-top: 10px;
+}
+
+.home-swipe-point-item {
+  width: 5px;
+  height: 5px;
+  border-radius: 3px;
+  margin: 0 7px;
+  position: relative;
+}
+
+.home-swipe-point-item img {
+  width: 10px;
+  height: 10px;
+  position: absolute;
+  top: -4px;
+  left: -1.5px;
+}
+
 .home-list {
   margin: 25px 0 35px;
 }
 .home-list li {
   margin-top: 25px;
+  position: relative;
 }
 .list-item-img {
   width: 100%;

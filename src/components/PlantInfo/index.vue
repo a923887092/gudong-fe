@@ -8,6 +8,8 @@
       <mt-field class="plant-info-content-field" placeholder="输入您的姓名" v-model="username"></mt-field>
       <span>手机号码：</span>
       <mt-field class="plant-info-content-field" type="number" placeholder="请输入您的手机号码" v-model="phoneNumber"></mt-field>
+      <span>数量：</span>
+      <mt-field class="plant-info-content-field" type="number" placeholder="请输入购买数量" v-model="buyNumber"></mt-field>
       <span>收货地址：</span>
       <div @click="handleAreaClick">
         <mt-field readonly class="plant-info-content-field" placeholder="选择您的省市区" v-model="areaListValue">
@@ -66,6 +68,7 @@ export default {
       areaList: [],
       areaListValue: '',
       plantPrice: '0',
+      buyNumber: '1',
       plantNo: '',
       slots: [
         {
@@ -133,6 +136,12 @@ export default {
           position: 'bottom',
           className: 'plant-info-toast'
         })
+      } else if (!this.buyNumber) {
+        Toast({
+          message: '请输入购买数量',
+          position: 'bottom',
+          className: 'plant-info-toast'
+        })
       } else if (!this.areaListValue) {
         Toast({
           message: '请选择省市区',
@@ -152,8 +161,6 @@ export default {
           className: 'plant-info-toast'
         })
       } else {
-        // console.log('pay:' + JSON.stringify(this))
-        // console.log('pay1:' + this)
         const params = {
           province: this.areaList[0],
           city: this.areaList[1],
@@ -162,6 +169,7 @@ export default {
           plantNo: this.plantNo || this.$route.params.plantNo,
           realName: this.username,
           mobile: this.phoneNumber,
+          count: this.buyNumber,
           accessToken: sStorage.get('token'),
           platform: this.isInWX ? '1' : '2'
         }

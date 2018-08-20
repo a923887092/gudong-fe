@@ -5,6 +5,7 @@
     </mt-header>
     <div :class="isInWX ? 'live-content in-wx' : 'live-content'">
       <video
+        preload="auto"
         webkit-playsinline="true"
         x5-video-player-type="h5"
         x5-video-player-fullscreen="true"
@@ -92,7 +93,7 @@
     </div>
     <div class="farm-space-divide"></div>
     <div>
-      <mt-navbar class="farm-navbar" v-model="selected">
+      <mt-navbar :fixed="navbarFixed" ref="navbar" class="farm-navbar" v-model="selected">
         <mt-tab-item id="1">
           <div style="position: relative">
             <span>吐槽区</span>
@@ -150,7 +151,7 @@
             <span>农场还没有添加说明，请稍后查看～</span>
           </div>
           <div v-show="farmInfo.farmInfoUrl || farmInfo.farmInfoVideo">
-            <div v-show="false" class="farm-video">
+            <div class="farm-video">
               <!-- <div class="farm-video-init">
                 <img src="http://yun.it7090.com/video/XHLaunchAd/video01.mp4?vframe/jpg/offset/3" />
                 <img src="@/assets/icon_video_play.png"/>
@@ -167,6 +168,7 @@
                 :poster="farmInfo.farmInfoVideo + '?vframe/jpg/offset/3'"
               >
               </video> -->
+              <div id="youkuplayer" class="youku-container"></div>
             </div>
             <div style="display: flex; justify-content: space-between; align-items: center;">
               <img class="farm-content-divide" src="../../assets/img_detail_title_left.png"/>
@@ -229,9 +231,9 @@ export default {
     const visibilityChangeEvent = hiddenProperty.replace(/hidden/i, 'visibilitychange')
     const onVisibilityChange = function () {
       if (document[hiddenProperty]) {
-        console.log('页面非激活')
+        // console.log('页面非激活')
       } else {
-        console.log('页面激活')
+        // console.log('页面激活')
       }
     }
     document.addEventListener(visibilityChangeEvent, onVisibilityChange)
@@ -263,6 +265,13 @@ export default {
           type: 'application/x-mpegURL'
         })
         this.player.load()
+        const ykPlayer = new window.YKU.Player('youkuplayer',{
+          styleid: '0',
+          client_id: 'd0d4ff36fe1ac456',
+          vid: 'XMzc3OTU1MTUzNg==',
+          newPlayer: true
+        })
+        // ykPlayer.playVideo()
         // this.player.play()
         this.messageRead(res.data.message.map(item => item.messageNo))
         if (this.isInWX) {
@@ -357,7 +366,8 @@ export default {
       audioStatus: false,
       refreshInt: null,
       isAllData: false,
-      bottomVisible: false
+      bottomVisible: false,
+      navbarFixed: false
     }
   },
   beforeRouteEnter (to, from, next) {
@@ -428,8 +438,16 @@ export default {
       window.smoothscroll()
     },
     catchScroll () {
+
+      const navbar = this.navbar || (this.$refs.navbar.$el.offsetTop && (this.navbar = this.$refs.navbar.$el.offsetTop))
+      const navbarOffset = navbar - document.documentElement.scrollTop
+      if (navbarOffset <= 0) {
+        this.navbarFixed = true
+      } else {
+        this.navbarFixed = false
+      }
       this.visible = (window.pageYOffset > 300)
-      this.bottomVisible = (window.pageYOffset > 740)
+      this.bottomVisible = (window.pageYOffset > 740) 
     },
     handlePlant () {
       this.$router.push({ path: '/plant/' + this.plantInfo.plantNo })

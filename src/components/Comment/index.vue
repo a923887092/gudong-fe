@@ -165,7 +165,7 @@ export default {
   .comment-btn {
     display: flex;
     justify-content: center;
-    margin-top: 5px;
+    margin-top: 50px;
   }
   .comment-btn-style {
     width: 335px;
