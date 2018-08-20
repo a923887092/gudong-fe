@@ -12,18 +12,18 @@
                 <img src="@/assets/icon_time.png"/>
                 <span>认种时间：{{ item.startTime }}</span>
                 <span>至</span>
-                <span>{{ item.startTime }}</span>
+                <span>{{ item.endTime }}</span>
               </div>
-              <img class="pc-tab-item-img" src="../../assets/logo.png"/>
+              <img class="pc-tab-item-img" :src="item.farmImg"/>
               <div class="pc-tab-item-title">
                 <span>{{ item.farmName }}</span>
-                <img :src="item.status + '' === '1' ? require('../../assets/img_label1.png') : require('../../assets/img_label2.png')" />
+                <img :src="item.status + '' === '0' ? require('../../assets/img_label1.png') : require('../../assets/img_label2.png')" />
               </div>
               <div class="pc-tab-item-des">
                 <img src="../../assets/icon_address.png"/>
                 <span>{{ item.farmCity }}</span>
                 <img src="../../assets/icon_money.png"/>
-                <span>认种金额：{{ salePrice }}元</span>
+                <span>认种金额：{{ item.salePrice }}元</span>
                 <img src="../../assets/icon_number.png"/>
                 <span>认种数量：1</span>
               </div>
@@ -94,7 +94,7 @@ export default {
       const vm = this
       fetchData(apis.myPlant, { status, accessToken: token, platform: this.isInWX ? '1' : '2' }).then(res => {
         if (res.code === 0) {
-          vm.dataList = res.data.result
+          vm.dataList = res.data
         }
       })
     }

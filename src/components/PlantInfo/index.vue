@@ -4,19 +4,26 @@
       <mt-button slot='left' icon='back' @click="handleBack"><strong>认种信息</strong></mt-button>
     </mt-header>
     <div class="plant-info-content">
-      <span>姓名：</span>
-      <mt-field class="plant-info-content-field" placeholder="输入您的姓名" v-model="username"></mt-field>
-      <span>手机号码：</span>
-      <mt-field class="plant-info-content-field" type="number" placeholder="请输入您的手机号码" v-model="phoneNumber"></mt-field>
-      <span>数量：</span>
-      <mt-field class="plant-info-content-field" type="number" placeholder="请输入购买数量" v-model="buyNumber"></mt-field>
-      <span>收货地址：</span>
-      <div @click="handleAreaClick">
-        <mt-field readonly class="plant-info-content-field" placeholder="选择您的省市区" v-model="areaListValue">
-          <img src="../../assets/next_copy.png" class="area-icon" />
-        </mt-field>
+      <div>姓名：</div>
+      <div class="plant-info-content-field">
+        <input placeholder="输入您的姓名" v-model="username" />
       </div>
-      <mt-field class="plant-info-content-field" placeholder="输入您的详细地址" v-model="areaInfo"></mt-field>
+      <span>手机号码：</span>
+      <div class="plant-info-content-field">
+        <input type="number" placeholder="请输入您的手机号码" v-model="phoneNumber"/>
+      </div>
+      <span>数量：</span>
+      <div class="plant-info-content-field">
+        <input type="number" placeholder="请输入购买数量" v-model="buyNumber"/>
+      </div>
+      <span>收货地址：</span>
+      <div class="plant-info-content-field" @click="handleAreaClick">
+        <input disabled placeholder="选择您的省市区" v-model="areaListValue" />
+        <img src="../../assets/next_copy.png" class="area-icon" />
+      </div>
+      <div class="plant-info-content-field">
+        <input placeholder="输入您的详细地址" v-model="areaInfo"/>
+      </div>
       <div class="plant-info-protocol">
         <img @click="protocolClick(true)" v-show="!checked" src="../../assets/icon_select_unselected.png" />
         <img @click="protocolClick(false)" v-show="checked" src="../../assets/icon_select_selected.png" />
@@ -24,7 +31,7 @@
         <a>《谷咚农地认种协议》</a>
       </div>
       <div class="plant-info-btn">
-        <mt-button class="plant-info-btn-style" type="primary" @click="handlePlant">认种 ￥{{ plantPrice }}/年</mt-button>
+        <mt-button class="plant-info-btn-style" type="primary" @click="handlePlant">认种 ￥{{ (buyNumber ? buyNumber : 1) * plantPrice }}/年</mt-button>
       </div>
       <mt-popup
         class="popup-style"

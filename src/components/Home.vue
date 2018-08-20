@@ -21,7 +21,7 @@
     </div>
     <ul v-show="farms && farms.length > 0" class="home-list">
       <li v-for="(item ,index) in farms" :key="index" @click="goLiveDetail(item)">
-        <div v-show="item.status === 0" style="z-index: 200; position: absolute; top: 0; left: 0;  width: 100%; height: 100%; background: rgb(255, 255, 255, 0.3);"></div>
+        <div v-show="item.status === 0" style="z-index: 200; position: absolute; top: 0; left: 0;  width: 100%; height: 100%; background-color: rgb(255, 255, 255, 0.3);"></div>
         <div class="list-item-img">
           <img v-show="!!item.isRecommand" class="list-item-tag" src="../assets/img_label_recommend.png"/>
           <img v-lazy.container="item.farmImg" style="width: 100%; height: 100%;" />
@@ -83,7 +83,7 @@ export default {
         spaceBetween: 5,
         loop: false,
         autoplay: true,
-        on:{
+        on: {
           slideChange: function () {
             vm.swipeSelected = this.activeIndex
           }
@@ -172,7 +172,7 @@ export default {
     wxShare (title, link, nickName) {
     },
     goLiveDetail: function (item) {
-      this.$router.push({ path: '/live/' + item.farmNo + '/detail/' + item.farmName })
+      item.status !== 0 && this.$router.push({ path: '/live/' + item.farmNo + '/detail/' + item.farmName })
     },
     bannerClick (targetUrl) {
       location.href = targetUrl

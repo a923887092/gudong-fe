@@ -96,23 +96,36 @@ const beforFetch = function () {
 }
 if (!sStorage.get('token')) {
   const params = { platform: '2' }
-  const { code, isShare } = paramsUtils.url2json(location)
-  if (browser.versions.wx) {
-    params.code = code
-    params.platform = '1'
-  }
-  if (isShare + '' === '1') {
-    location.href = 'https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx650e30e3ec9bfd40&redirect_uri=http%3a%2f%2fmall.91ncp.com.cn&response_type=code&scope=snsapi_userinfo&state=#wechat_redirect'
+  const { code, isShare, no, state } = paramsUtils.url2json(location)
+  if (no) {
+    const str = no
+    location.href = 'https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx650e30e3ec9bfd40&redirect_uri=http%3a%2f%2fmall.91ncp.com.cn&response_type=code&scope=snsapi_userinfo&state=' + str + '#wechat_redirect'
   } else {
-    fetchData('/api/gateway/auth/getToken', params).then(res => {
-      if (res.code !== 0) {
-        document.write('网络错误！')
+    if (browser.versions.wx) {
+      params.code = code
+      params.platform = '1'
+    }
+    if (isShare + '' === '1') {
+      location.href = 'https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx650e30e3ec9bfd40&redirect_uri=http%3a%2f%2fmall.91ncp.com.cn&response_type=code&scope=snsapi_userinfo&state=#wechat_redirect'
+    } else {
+      if (state) {
+        if (state !== 'personCenter') {
+          location.href = 'http://mall.91ncp.com.cn/?code=' + code + '#/live/' + state + '/detail/null'
+        } else {
+          location.href = 'http://mall.91ncp.com.cn/?code=' + code + '#/personCenter'
+        }
       } else {
-        const token = res.data.accessToken
-        sStorage.set('token', token)
-        beforFetch()
+        fetchData('/api/gateway/auth/getToken', params).then(res => {
+          if (res.code !== 0) {
+            document.write('网络错误！')
+          } else {
+            const token = res.data.accessToken
+            sStorage.set('token', token)
+            beforFetch()
+          }
+        })
       }
-    })
+    }
   }
 } else {
   beforFetch()

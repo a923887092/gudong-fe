@@ -253,10 +253,11 @@ export default {
         vm.farmInfo = res.data.farmInfo
         vm.message = res.data.message
         vm.plantHis = res.data.plantHis
+        document.title = res.data.detail.farmName
         this.player = window.videojs('my_video_player', {
           controls: false,
           autoplay: false,
-           preload: 'auto',
+          preload: 'auto',
           loop: false
         }, function () {
         })
@@ -265,7 +266,7 @@ export default {
           type: 'application/x-mpegURL'
         })
         this.player.load()
-        const ykPlayer = new window.YKU.Player('youkuplayer',{
+        this.ykPlayer = new window.YKU.Player('youkuplayer', {
           styleid: '0',
           client_id: 'd0d4ff36fe1ac456',
           vid: 'XMzc3OTU1MTUzNg==',
@@ -291,14 +292,14 @@ export default {
             )
             wx.onMenuShareTimeline({
               title: '强势围观 | 已有' + res.data.plant.saleCount + '人，花费' + share.price + '元成为' + res.data.detail.farmName + '的农场主',
-              link: 'http://mall.91ncp.com.cn/?isShare=1#/',
+              link: 'http://mall.91ncp.com.cn/?no=' + res.data.detail.farmNo + '&name=' + res.data.detail.farmName + '#/',
               imgUrl: res.data.detail.shareImg,
               success: function () {}
             })
             wx.onMenuShareAppMessage({
               title: '强势围观 | 已有' + res.data.plant.saleCount + '人，花费' + share.price + '元成为' + res.data.detail.farmName + '的农场主',
               desc: '您的好友' + share.nickName + '已成为' + res.data.detail.farmName + '的农场主，一起来看看吧 ~',
-              link: 'http://mall.91ncp.com.cn/?isShare=1#/',
+              link: 'http://mall.91ncp.com.cn/?no=' + res.data.detail.farmNo + '&name=' + res.data.detail.farmName + '#/',
               imgUrl: res.data.detail.shareImg,
               type: '',
               dataUrl: '',
@@ -308,7 +309,7 @@ export default {
             wx.onMenuShareQQ({
               title: '强势围观 | 已有' + res.data.plant.saleCount + '人，花费' + share.price + '元成为' + res.data.detail.farmName + '的农场主',
               desc: '您的好友' + share.nickName + '已成为' + res.data.detail.farmName + '的农场主，一起来看看吧 ~',
-              link: 'http://mall.91ncp.com.cn/?#/',
+              link: 'http://mall.91ncp.com.cn/?#/live/' + res.data.detail.farmNo + '/detail/' + res.data.detail.farmName,
               imgUrl: res.data.detail.shareImg,
               success: function () {
               }
@@ -438,7 +439,6 @@ export default {
       window.smoothscroll()
     },
     catchScroll () {
-
       const navbar = this.navbar || (this.$refs.navbar.$el.offsetTop && (this.navbar = this.$refs.navbar.$el.offsetTop))
       const navbarOffset = navbar - document.documentElement.scrollTop
       if (navbarOffset <= 0) {
@@ -447,7 +447,7 @@ export default {
         this.navbarFixed = false
       }
       this.visible = (window.pageYOffset > 300)
-      this.bottomVisible = (window.pageYOffset > 740) 
+      this.bottomVisible = (window.pageYOffset > 740)
     },
     handlePlant () {
       this.$router.push({ path: '/plant/' + this.plantInfo.plantNo })
@@ -532,10 +532,10 @@ export default {
       if (n) {
         n = n + ''
         const re = /\d{1,3}(?=(\d{3})+$)/g
-        const n1 = n.replace(/^(\d+)((\.\d+)?)$/, function (s,s1,s2) {
-          return s1.replace(re,'$&,') + s2
+        const n1 = n.replace(/^(\d+)((\.\d+)?)$/, function (s, s1, s2) {
+          return s1.replace(re, '$&,') + s2
         })
-    　　return n1
+        return n1
       } else {
         return '0'
       }
