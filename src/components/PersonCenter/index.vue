@@ -17,7 +17,7 @@
               <img class="pc-tab-item-img" :src="item.farmImg"/>
               <div class="pc-tab-item-title">
                 <span>{{ item.farmName }}</span>
-                <img :src="item.status + '' === '0' ? require('../../assets/img_label1.png') : require('../../assets/img_label2.png')" />
+                <img :src="item.plantStatus + '' === '0' ? require('../../assets/img_label1.png') : require('../../assets/img_label2.png')" />
               </div>
               <div class="pc-tab-item-des">
                 <img src="../../assets/icon_address.png"/>
@@ -39,10 +39,10 @@
                 <span>至</span>
                 <span>{{ item.startTime }}</span>
               </div>
-              <img class="pc-tab-item-img" src="../../assets/logo.png"/>
+              <img class="pc-tab-item-img" :src="item.farmImg"/>
               <div class="pc-tab-item-title">
                 <span>{{ item.farmName }}</span>
-                <img :src="item.status + '' === '1' ? require('../../assets/img_label1.png') : require('../../assets/img_label2.png')" />
+                <img :src="item.plantStatus + '' === '1' ? require('../../assets/img_label1.png') : require('../../assets/img_label2.png')" />
               </div>
               <div class="pc-tab-item-des">
                 <img src="../../assets/icon_address.png"/>
