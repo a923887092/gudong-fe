@@ -21,7 +21,9 @@
     </div>
     <ul v-show="farms && farms.length > 0" class="home-list">
       <li v-for="(item ,index) in farms" :key="index" @click="goLiveDetail(item)">
-        <div v-show="item.status === 0" style="z-index: 200; position: absolute; top: 0; left: 0;  width: 100%; height: 100%; background-color: rgb(255, 255, 255, 0.3);"></div>
+        <div v-show="item.status === 0" class="item-transparent">
+          <p>敬请期待...</p>
+        </div>
         <div class="list-item-img">
           <img v-show="!!item.isRecommand" class="list-item-tag" src="../assets/img_label_recommend.png"/>
           <img v-lazy.container="item.farmImg" style="width: 100%; height: 100%;" />
@@ -243,6 +245,22 @@ export default {
 
 .home-list {
   margin: 25px 0 35px;
+}
+.item-transparent {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.3);
+}
+.item-transparent p {
+  color: #FFFFFF;
+  font-size: 18px;
 }
 .home-list li {
   margin-top: 25px;

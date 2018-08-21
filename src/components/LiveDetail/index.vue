@@ -93,7 +93,7 @@
     </div>
     <div class="farm-space-divide"></div>
     <div>
-      <mt-navbar :fixed="navbarFixed" ref="navbar" class="farm-navbar" v-model="selected">
+      <mt-navbar ref="navbar" :class="navbarFixed ? 'farm-navbar fixed' : 'farm-navbar'" v-model="selected">
         <mt-tab-item id="1">
           <div style="position: relative">
             <span>吐槽区</span>
@@ -109,7 +109,7 @@
             <img src="@/assets/img_logo_nodata.png"/>
             <span>农场还没有吐槽，快来参加吐槽吧～</span>
           </div>
-          <ul v-show="message && message.length > 0">
+          <ul class="farm-comment-ul" v-show="message && message.length > 0">
             <li
               class="farm-comment-li"
               v-for="(item) in message"
@@ -223,6 +223,7 @@ Vue.use(InfiniteScroll)
 export default {
   name: 'LiveDetail',
   mounted () {
+    window.scrollTo(0 ,0)
     const vm = this
     // setTimeout(() => {
     //   vm.videoControlStatus = false
@@ -243,7 +244,7 @@ export default {
     audio.addEventListener('timeupdate', this.updateProgress, false)
     const token = sStorage.get('token')
     const params = this.$route.params
-    document.title = params.liveTitle
+    document.title = params.liveTitle || ''
     this.farmNo = params.liveId
     // const farmNo = paramsUtils.url2json(location).farmNo
     fetchData(apis.farmDetail, { accessToken: token, farmNo: params.liveId, platform: this.isInWX ? '1' : '2' }).then(res => {
@@ -265,7 +266,7 @@ export default {
           src: res.data.detail.videoUrl,
           type: 'application/x-mpegURL'
         })
-        this.player.load()
+        // this.player.load()
         this.ykPlayer = new window.YKU.Player('youkuplayer', {
           styleid: '0',
           client_id: 'd0d4ff36fe1ac456',

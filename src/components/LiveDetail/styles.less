@@ -251,6 +251,13 @@
   padding: 10px 30px 0 30px;
   box-sizing: border-box;
   border-bottom: 1px solid #E7E7E7;
+  position: static;
+  z-index: 2000;
+  width: 100%;
+  &.fixed {
+    position: fixed;
+    top: 0;
+  }
 }
 .farm-tab-container {
   margin: 25px 20px 0 20px;
@@ -264,6 +271,9 @@
       color: #39e590;
     }
   }
+}
+.farm-comment-ul {
+  margin-bottom: 40px;
 }
 .farm-comment-li {
   margin-bottom: 20px;

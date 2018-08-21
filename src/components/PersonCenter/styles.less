@@ -8,59 +8,59 @@
   }
   &-tab {
     &-item {
-      position: relative;
       ul li {
         margin-bottom: 25px;
-      }
-      &-time {
-        position: absolute;
-        top: 105px;
-        right: 0;
-        left: 0;
-        height: 30px;
-        display: flex;
-        align-items: center;
-        img {
-          width: 15px;
+        position: relative;
+        .pc-tab-item-time {
+          position: absolute;
+          top: 105px;
+          right: 0;
+          left: 0;
+          height: 30px;
+          display: flex;
+          align-items: center;
+          img {
+            width: 15px;
+            height: 15px;
+            padding-left: 15px;
+            padding-right: 5px;
+          }
+        }
+        .pc-tab-item-img {
+          width: 375px;
+          height: 135px;
+        }
+        .pc-tab-item-title {
+          padding: 0 20px;
+          height: 20px;
+          display: flex;
+          align-items: center;
+          font-size: 16px;
+          font-family: PingFangSC-Medium;
+          color: rgba(48,48,48,1);
+          img {
+            height: 100%;
+            width: 53px;
+            margin-left: 10px;
+          }
+        }
+        .pc-tab-item-des {
+          margin-top: 12px;
+          padding: 0 20px;
           height: 15px;
-          padding-left: 15px;
-          padding-right: 5px;
-        }
-      }
-      &-img {
-        width: 375px;
-        height: 135px;
-      }
-      &-title {
-        padding: 0 20px;
-        height: 20px;
-        display: flex;
-        align-items: center;
-        font-size: 16px;
-        font-family: PingFangSC-Medium;
-        color: rgba(48,48,48,1);
-        img {
-          height: 100%;
-          width: 53px;
-          margin-left: 10px;
-        }
-      }
-      &-des {
-        margin-top: 12px;
-        padding: 0 20px;
-        height: 15px;
-        display: flex;
-        align-items: center;
-        font-size: 12px;
-        font-family: PingFangSC-Regular;
-        color: rgba(153,153,153,1);
-        img {
-          height: 15px;
-          width: 15px;
-          margin-right: 6px;
-        }
-        img:not(:first-child) {
-          margin-left: 24px;
+          display: flex;
+          align-items: center;
+          font-size: 12px;
+          font-family: PingFangSC-Regular;
+          color: rgba(153,153,153,1);
+          img {
+            height: 15px;
+            width: 15px;
+            margin-right: 6px;
+          }
+          img:not(:first-child) {
+            margin-left: 24px;
+          }
         }
       }
     }

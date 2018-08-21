@@ -7,7 +7,7 @@
       <mt-tab-container class="pc-tab" v-model="selected">
         <mt-tab-container-item class="pc-tab-item" id="1">
           <ul>
-            <li v-for="(item) in dataList" :key="item.farmNo">
+            <li v-for="(item, index) in dataList" :key="index">
               <div class="pc-tab-item-time">
                 <img src="@/assets/icon_time.png"/>
                 <span>认种时间：{{ item.startTime }}</span>
