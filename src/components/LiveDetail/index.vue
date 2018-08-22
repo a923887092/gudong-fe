@@ -254,28 +254,6 @@ export default {
         vm.farmInfo = res.data.farmInfo
         vm.message = res.data.message
         vm.plantHis = res.data.plantHis
-        document.title = res.data.detail.farmName
-        this.player = window.videojs('my_video_player', {
-          controls: false,
-          autoplay: false,
-          preload: 'auto',
-          loop: false
-        }, function () {
-        })
-        this.player.src({
-          src: res.data.detail.videoUrl,
-          type: 'application/x-mpegURL'
-        })
-        // this.player.load()
-        this.ykPlayer = new window.YKU.Player('youkuplayer', {
-          styleid: '0',
-          client_id: 'd0d4ff36fe1ac456',
-          vid: 'XMzc3OTU1MTUzNg==',
-          newPlayer: true
-        })
-        // ykPlayer.playVideo()
-        // this.player.play()
-        this.messageRead(res.data.message.map(item => item.messageNo))
         if (this.isInWX) {
           const share = res.data.share
           // const urlArr = location.href.split('#').splice(0, 1)
@@ -293,14 +271,14 @@ export default {
             )
             wx.onMenuShareTimeline({
               title: '强势围观 | 已有' + res.data.plant.saleCount + '人，花费' + share.price + '元成为' + res.data.detail.farmName + '的农场主',
-              link: 'http://mall.91ncp.com.cn/?no=' + res.data.detail.farmNo + '&name=' + res.data.detail.farmName + '#/',
+              link: 'http://mall.91ncp.com.cn/?no=' + res.data.detail.farmNo + '#/',
               imgUrl: res.data.detail.shareImg,
               success: function () {}
             })
             wx.onMenuShareAppMessage({
               title: '强势围观 | 已有' + res.data.plant.saleCount + '人，花费' + share.price + '元成为' + res.data.detail.farmName + '的农场主',
               desc: '您的好友' + share.nickName + '已成为' + res.data.detail.farmName + '的农场主，一起来看看吧 ~',
-              link: 'http://mall.91ncp.com.cn/?no=' + res.data.detail.farmNo + '&name=' + res.data.detail.farmName + '#/',
+              link: 'http://mall.91ncp.com.cn/?no=' + res.data.detail.farmNo + '#/',
               imgUrl: res.data.detail.shareImg,
               type: '',
               dataUrl: '',
@@ -310,13 +288,36 @@ export default {
             wx.onMenuShareQQ({
               title: '强势围观 | 已有' + res.data.plant.saleCount + '人，花费' + share.price + '元成为' + res.data.detail.farmName + '的农场主',
               desc: '您的好友' + share.nickName + '已成为' + res.data.detail.farmName + '的农场主，一起来看看吧 ~',
-              link: 'http://mall.91ncp.com.cn/?#/live/' + res.data.detail.farmNo + '/detail/' + res.data.detail.farmName,
+              link: 'http://mall.91ncp.com.cn/?#/live/' + res.data.detail.farmNo + '/detail/null',
               imgUrl: res.data.detail.shareImg,
               success: function () {
               }
             })
           })
         }
+        document.title = res.data.detail.farmName
+        this.player = window.videojs('my_video_player', {
+          controls: false,
+          autoplay: false,
+          preload: 'auto',
+          loop: false
+        }, function () {
+        })
+        this.player.src({
+          src: res.data.detail.videoUrl,
+          type: 'application/x-mpegURL'
+        })
+        this.player.load()
+        this.ykPlayer = new window.YKU.Player('youkuplayer', {
+          styleid: '0',
+          client_id: 'd0d4ff36fe1ac456',
+          vid: 'XMzc3OTU1MTUzNg==',
+          newPlayer: true
+        })
+        // ykPlayer.playVideo()
+        // this.player.play()
+        this.messageRead(res.data.message.map(item => item.messageNo))
+        
       }
     })
     this.refreshInt = setInterval(() => {
@@ -441,12 +442,13 @@ export default {
     },
     catchScroll () {
       const navbar = this.navbar || (this.$refs.navbar.$el.offsetTop && (this.navbar = this.$refs.navbar.$el.offsetTop))
-      const navbarOffset = navbar - document.documentElement.scrollTop
-      if (navbarOffset <= 0) {
-        this.navbarFixed = true
-      } else {
-        this.navbarFixed = false
-      }
+      // const navbarOffset = navbar - document.documentElement.scrollTop
+      // if (navbarOffset <= 0) {
+      //   this.navbarFixed = true
+      // } else {
+      //   this.navbarFixed = false
+      // }
+      this.navbarFixed = (window.pageYOffset >= navbar)
       this.visible = (window.pageYOffset > 300)
       this.bottomVisible = (window.pageYOffset > 740)
     },

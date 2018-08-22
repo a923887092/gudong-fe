@@ -12,6 +12,8 @@
   height: 200px;
   margin-top: 40px;
   position: relative;
+  -webkit-transform: translateZ(0);
+  -webkit-overflow-scrolling: touch;
 }
 .live-content.in-wx {
   margin-top: 0;
@@ -257,6 +259,8 @@
   &.fixed {
     position: fixed;
     top: 0;
+    left: 0;
+    right: 0;
   }
 }
 .farm-tab-container {
